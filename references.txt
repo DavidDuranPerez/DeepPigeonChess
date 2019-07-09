@@ -1,0 +1,12 @@
+Basics:
+* I/O protocol (UCI) --> http://wbec-ridderkerk.nl/html/UCIProtocol.html
+* Rules
+* Position Evaluation (heuristic rules) --> https://www.chess.com/blog/zaifrun/creating-a-chess-engine-part-4---position-evaluation
+* Find next move (min-max, alpha-beta) --> https://www.chess.com/blog/zaifrun/creating-a-chess-engine-part-2
+
+Intermediate:
+* Opening book
+* Endgame tables (up to 7 pieces)
+
+Advanced:
+* Neural networks (AI)
