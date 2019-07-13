@@ -1,0 +1,19 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build_custom",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g", "main.cpp", "uci.cpp", "-o", "../dist/DeepPigeon.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
