@@ -10,21 +10,25 @@
 #include <ctime>
 #include <string>
 
-class UCI {
-    public:
-        // Constructor
-        UCI();
+// Main class
+class UCI
+{
+public:
+  // Constructor
+  UCI();
 
-        // Functions
-        void engine_info();
+  // Functions
+  void engine_info(); // Print engine information on the console
+  void comm_loop(); // The primary UCI communication loop
 
-    private:
-        // Parameters
-        std::string engine_name = "Deep Pigeon";
-        std::string engine_author = "David Duran";
-        std::string engine_copyright = "Copyright (C) 2019";
+private:
+  // Parameters
+  std::string engine_name = "Deep Pigeon";
+  std::string engine_author = "David Duran";
+  std::string engine_copyright = "Copyright (C) 2019";
+  std::string engine_version = "0.1";
 
-        std::time_t initial_time;
+  std::time_t initial_time;
 };
 
 #endif

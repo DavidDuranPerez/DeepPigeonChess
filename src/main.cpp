@@ -3,7 +3,6 @@
   Copyright (C) 2019, David Duran
 */
 
-
 // Own libraries
 #include "uci.h"
 
@@ -13,14 +12,16 @@
 int main()
 {
 	// Initialize the communication
-	UCI uci;
-	
+	UCI uci = UCI();
+
 	// Give the information of the engine
 	uci.engine_info();
 
+	// Communication loop
+	uci.comm_loop();
+
 	// For debugging
-	system("pause");
+	//system("pause");
 
 	return 0;
 }
-
