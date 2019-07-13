@@ -4,6 +4,7 @@
 */
 
 #include "uci.h"
+#include "board.h"
 
 // Constructor
 UCI::UCI(){
@@ -45,6 +46,7 @@ void UCI::comm_loop(){
     }
     else if(command=="position"){
       // Pass the position to the engine
+      Board board = Board();
     }
     else if(command=="go"){
       // Pass several parameters to search
