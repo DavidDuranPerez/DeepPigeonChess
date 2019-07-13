@@ -20,19 +20,19 @@ void UCI::engine_info(){
 
 // The primary UCI communication loop
 void UCI::comm_loop(){
-  // Variable representing the input from the user
+  // Variable representing the command from the GUI
   // Implemented UCI commands:
-  // GUI to engine: quit
+  // GUI to engine: quit, uci
   // Engine to GUI: id name, id author, uciok
-  std::string input; 
+  std::string command;
 
   // The communication loop
   do{
-    // Receive the input
-    std::cin >> input;
+    // Receive the input from the GUI
+    std::cin >> command;
 
     // Different commands
-    if(input=="uci"){ // It tellsengine to use the uci communication
+    if(command=="uci"){ // It tellsengine to use the uci communication
       // id
       std::cout << "id name " << this->engine_name << " " << this->engine_version << "\n";
       std::cout << "id author " << this->engine_author << "\n";
@@ -40,5 +40,27 @@ void UCI::comm_loop(){
       // uciok
       std::cout << "uciok" << "\n";
     }
-  } while (input != "quit");
+    else if(command=="ucinewgame"){
+      // It should clear any search
+    }
+    else if(command=="position"){
+      // Pass the position to the engine
+    }
+    else if(command=="go"){
+      // Pass several parameters to search
+      // Send info commands --> JUST AN EXAMPLE!!
+      std::cout << "info depth 1 seldepth 0" << "\n";
+		  std::cout << "info score cp 13  depth 1 nodes 13 time 15 pv d2d4" << "\n"; 
+    }
+    else if(command=="stop"){
+      // Stop searching
+      // Send the best move --> JUST AN EXAMPLE!!
+      std::cout << "bestmove d2d4" << "\n";
+    }
+    else if(command=="isready"){
+      // Finish anything that is doing
+      // Answer back
+      std::cout << "readyok" << "\n";
+    }
+  } while (command != "quit");
 }

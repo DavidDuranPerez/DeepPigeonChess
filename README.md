@@ -1,2 +1,2 @@
 # DeepPigeonChess
-"Deep Pigeon" chess engine
+Deep Pigeon chess engine written in C++
