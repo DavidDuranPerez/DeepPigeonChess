@@ -34,6 +34,13 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "tuple": "cpp",
+        "vector": "cpp",
+        "xmemory": "cpp",
+        "xtree": "cpp"
     }
 }
