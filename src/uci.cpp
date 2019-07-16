@@ -19,6 +19,37 @@ void UCI::engine_info(){
   std::cout << this->engine_copyright << ", " << this->engine_author << "\n\n";
 }
 
+// Get position
+void UCI::get_position(std::stringstream& var_stream){
+  std::string arg1, arg_next; // First argument and next one
+  std::string fen_string; // FEN string
+  
+  // Consume the first parameter of position: fen or startpos
+  var_stream >> arg1;
+
+  // Get the position
+  if(arg1=="startpos"){
+    // Default position
+    fen_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    // Consume "moves" token if any
+    var_stream >> arg_next;
+  }
+  else if(arg1=="fen"){
+    // FEN
+    while(var_stream >> arg_next && arg_next != "moves")
+      fen_string+=arg_next+" ";
+  }
+  else
+    return;
+
+  // Pass the position to the engine
+  Board board = Board(fen_string);
+
+  // Get the moves --> TBD!!!!!
+
+}
+
 // The primary UCI communication loop
 void UCI::comm_loop(){
   // Variable representing the command from the GUI
@@ -26,11 +57,16 @@ void UCI::comm_loop(){
   // GUI to engine: quit, uci
   // Engine to GUI: id name, id author, uciok
   std::string command;
+  std::string line_command;
 
   // The communication loop
   do{
-    // Receive the input from the GUI
-    std::cin >> command;
+    // Receive the input from the GUI by lines
+    getline(std::cin, line_command);
+
+    // Get the first word --> main command
+    std::stringstream var_stream(line_command); //  >> command;
+    var_stream >> command;
 
     // Different commands
     if(command=="uci"){ // It tellsengine to use the uci communication
@@ -45,8 +81,7 @@ void UCI::comm_loop(){
       // It should clear any search
     }
     else if(command=="position"){
-      // Pass the position to the engine
-      Board board = Board();
+      this->get_position(var_stream);
     }
     else if(command=="go"){
       // Pass several parameters to search

@@ -21,10 +21,11 @@ char Square::get_piece(){
 }
 
 // Constructor for the board --> default initial position
-Board::Board()
+Board::Board(std::string fen_string)
 {
     // Debugging
     this->debugging=true;
+
     // Starting position
     this->fen2pos("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }

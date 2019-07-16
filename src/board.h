@@ -33,7 +33,7 @@ private:
 class Board{
 public:
     // Constructor
-    Board();
+    Board(std::string fen_string);
 
 private:
     // Attributes

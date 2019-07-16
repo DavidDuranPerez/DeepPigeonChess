@@ -20,6 +20,7 @@ public:
   // Functions
   void engine_info(); // Print engine information on the console
   void comm_loop(); // The primary UCI communication loop
+  void get_position(std::stringstream& var_stream); // Get position from the UCI protocol
 
 private:
   // Parameters
