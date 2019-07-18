@@ -27,7 +27,7 @@ Board::Board(std::string fen_string)
     this->debugging=true;
 
     // Starting position
-    this->fen2pos("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    this->fen2pos(fen_string);
 }
 
 // Split a string
@@ -61,7 +61,7 @@ std::string Board::convert_fenrow(std::string fen_row){
         }
         else
         {
-            for(int ind=0; ind<(int)pieces_raw[count]; ind++){
+            for(int ind=0; ind<(int)pieces_raw[count]-48; ind++){
                 pieces += ' ';
                 count_clean++;
             }
@@ -106,6 +106,9 @@ void Board::fen2pos(std::string fen_str)
         {
             // Convert the raw pieces to 8 fixed format
             pieces = this->convert_fenrow(pos_splitted[8 - (i - 1)]);
+
+            if(this->debugging)
+                std::cout << "+---+---+---+---+---+---+---+---+" << "\n|";
         }
 
         for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
@@ -117,12 +120,15 @@ void Board::fen2pos(std::string fen_str)
             else
             {
                 this->squares[i][j] = Square(i - 1, col_map[j], pieces[j - 2], true);
+
+                if(this->debugging)
+                    std::cout << " " << this->squares[i][j].get_piece() << " |";
             }
-            if(this->debugging)
-                std::cout << this->squares[i][j].get_piece();
         }
         if(this->debugging)
             std::cout << "\n";
+        if(this->debugging && i==2)
+            std::cout << "+---+---+---+---+---+---+---+---+";
     }
 
     // See who has to move
