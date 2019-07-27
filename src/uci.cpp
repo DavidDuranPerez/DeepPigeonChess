@@ -46,15 +46,16 @@ void UCI::get_position(std::stringstream& var_stream){
   // Pass the position to the engine
   Board board = Board(fen_string);
 
-  // Get the moves --> TBD!!!!!
-
+  // Make the moves (if any)
+  while(var_stream >> arg_next)
+    board.move(arg_next);
 }
 
 // The primary UCI communication loop
 void UCI::comm_loop(){
   // Variable representing the command from the GUI
   // Implemented UCI commands:
-  // GUI to engine: quit, uci
+  // GUI to engine: quit, uci, position fen|startpos [fen_str] moves [moves]
   // Engine to GUI: id name, id author, uciok
   std::string command;
   std::string line_command;

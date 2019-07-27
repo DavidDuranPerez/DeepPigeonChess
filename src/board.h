@@ -20,6 +20,8 @@ public:
     Square(int row=1, char column='a', char piece='R', bool is_valid=true);
     // Get piece
     char get_piece();
+    // Set piece
+    void set_piece(char piece);
 
 private:
     // Attributes
@@ -34,6 +36,10 @@ class Board{
 public:
     // Constructor
     Board(std::string fen_string);
+    // Move
+    void move(std::string fromto);
+    // Print board
+    void print_board();
 
 private:
     // Attributes

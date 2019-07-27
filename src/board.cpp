@@ -6,6 +6,26 @@
 #include "board.h"
 #include <vector>
 
+// Mapping for the columns
+std::map<int, char> col_map = {
+    {2, 'a'},
+    {3, 'b'},
+    {4, 'c'},
+    {5, 'd'},
+    {6, 'e'},
+    {7, 'f'},
+    {8, 'g'},
+    {9, 'h'}};
+std::map<int, char> col_map_reverse = {
+    {'a', 2},
+    {'b', 3},
+    {'c', 4},
+    {'d', 5},
+    {'e', 6},
+    {'f', 7},
+    {'g', 8},
+    {'h', 9}};
+
 // Constructor for the square
 Square::Square(int row, char column, char piece, bool is_valid)
 {
@@ -16,18 +36,73 @@ Square::Square(int row, char column, char piece, bool is_valid)
 };
 
 // Get the piece
-char Square::get_piece(){
+char Square::get_piece()
+{
     return this->piece;
+}
+
+// Set the piece
+void Square::set_piece(char piece)
+{
+    this->piece = piece;
 }
 
 // Constructor for the board --> default initial position
 Board::Board(std::string fen_string)
 {
     // Debugging
-    this->debugging=true;
+    this->debugging = true;
 
     // Starting position
     this->fen2pos(fen_string);
+}
+
+// Move
+// This function assumes that the move is legal. It is not the responsibility of this function to check if it is legal
+void Board::move(std::string fromto)
+{
+    // It is always four characters
+    char from[2];
+    from[0] = fromto[0];
+    from[1] = fromto[1];
+    char to[2];
+    to[0] = fromto[2];
+    to[1] = fromto[3];
+
+    // Transform from algebraic to internal notation
+    int col_from = col_map_reverse[from[0]];
+    int row_from = (int)from[1] - '0' + 1;
+    int col_to = col_map_reverse[to[0]];
+    int row_to = (int)to[1] - '0' + 1;
+
+    // Get the piece from
+    char piece_from = this->squares[row_from][col_from].get_piece();
+    char piece_to = this->squares[row_to][col_to].get_piece();
+
+    // Set an empty piece in the from and set the from piece in the to
+    this->squares[row_from][col_from].set_piece(' ');
+    this->squares[row_to][col_to].set_piece(piece_from);
+
+    // Change the turn
+    this->white_moves = !this->white_moves;
+
+    // Allowed castles --> TBD!!!
+
+    // En passant --> TBD!!!
+
+    // Full moves
+    if (this->white_moves)
+        this->fullmoves += 1;
+
+    // Half moves
+    if (piece_to == ' ' && piece_from != 'p' && piece_from != 'P')
+        this->halfmoves += 1;
+    else
+        this->halfmoves = 0;
+
+    // Print the board if debugging
+    if (this->debugging)
+        this->print_board();
 }
 
 // Split a string
@@ -43,13 +118,14 @@ void Board::split_str(const std::string &str, Container &cont, char delim)
 }
 
 // Convert a FEN row to a fixed 8 row
-std::string Board::convert_fenrow(std::string fen_row){
+std::string Board::convert_fenrow(std::string fen_row)
+{
     // Raw pieces (in FEN format)
     std::string pieces_raw = fen_row;
-    
+
     // Fixed 8 pieces
     std::string pieces;
-    
+
     // Loop it
     int count_clean = 0;
     for (int count = 0; count < pieces_raw.length(); count++)
@@ -61,7 +137,8 @@ std::string Board::convert_fenrow(std::string fen_row){
         }
         else
         {
-            for(int ind=0; ind<(int)pieces_raw[count]-48; ind++){
+            for (int ind = 0; ind < (int)pieces_raw[count] - 48; ind++)
+            {
                 pieces += ' ';
                 count_clean++;
             }
@@ -84,17 +161,6 @@ void Board::fen2pos(std::string fen_str)
     std::vector<std::string> pos_splitted;
     this->split_str(pos, pos_splitted, '/');
 
-    // Mapping for the columns
-    std::map<int, char> col_map = {
-        {2, 'a'},
-        {3, 'b'},
-        {4, 'c'},
-        {5, 'd'},
-        {6, 'e'},
-        {7, 'f'},
-        {8, 'g'},
-        {9, 'h'}};
-
     // Set the squares
     for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
     { // row
@@ -106,9 +172,6 @@ void Board::fen2pos(std::string fen_str)
         {
             // Convert the raw pieces to 8 fixed format
             pieces = this->convert_fenrow(pos_splitted[8 - (i - 1)]);
-
-            if(this->debugging)
-                std::cout << "+---+---+---+---+---+---+---+---+" << "\n|";
         }
 
         for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
@@ -120,22 +183,15 @@ void Board::fen2pos(std::string fen_str)
             else
             {
                 this->squares[i][j] = Square(i - 1, col_map[j], pieces[j - 2], true);
-
-                if(this->debugging)
-                    std::cout << " " << this->squares[i][j].get_piece() << " |";
             }
         }
-        if(this->debugging)
-            std::cout << "\n";
-        if(this->debugging && i==2)
-            std::cout << "+---+---+---+---+---+---+---+---+";
     }
 
     // See who has to move
-    if(fen_splitted[1]=="w")
-        this->white_moves=true;
+    if (fen_splitted[1] == "w")
+        this->white_moves = true;
     else
-        this->white_moves=false;
+        this->white_moves = false;
 
     // Get the allowed castles
     this->allowed_castles = fen_splitted[2];
@@ -144,8 +200,36 @@ void Board::fen2pos(std::string fen_str)
     this->en_passant_target = fen_splitted[3];
 
     // Get halfmoves
-    this->halfmoves=std::stoi(fen_splitted[4]);
+    this->halfmoves = std::stoi(fen_splitted[4]);
 
     // Get fullmoves
-    this->fullmoves=std::stoi(fen_splitted[5]);
+    this->fullmoves = std::stoi(fen_splitted[5]);
+
+    // Print the board if debugging
+    if (this->debugging)
+        this->print_board();
+}
+
+// Print the board (for debugging purposes)
+void Board::print_board()
+{
+    for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
+    { // row
+        // Get the pieces
+        std::string pieces;
+        if (i < 10 && i > 1)
+            std::cout << "+---+---+---+---+---+---+---+---+"
+                      << "\n|";
+
+        for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
+        { // column
+            if (i < 10 && i > 1 && j < 10 && j > 1)
+                std::cout << " " << this->squares[i][j].get_piece() << " |";
+        }
+        std::cout << "\n";
+        if (i == 2){
+            std::cout << "+---+---+---+---+---+---+---+---+" << "\n";
+            std::cout << "White to move?: " << std::boolalpha << this->white_moves << "; Allowed castles: " << this->allowed_castles << "; En-passant targets: " << this->en_passant_target << "; Halfmoves: " << this->halfmoves << "; Fullmoves:" << this->fullmoves;
+        }
+    }
 }
