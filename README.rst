@@ -1,6 +1,10 @@
 This is Deep Pigeon, a chess engine written in C++
 ======================================================
 
+.. image:: https://travis-ci.org/DavidDuranPerez/DeepPigeonChess.svg?branch=master
+   :alt: DeepPigeon build status on Travis CI
+   :target: https://travis-ci.org/DavidDuranPerez/DeepPigeonChess
+
 Copyright (C) 2019, David Duran
 
 .. contents::
