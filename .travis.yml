@@ -1,0 +1,12 @@
+language: cpp
+sudo: required
+dist: trusty
+compiler: gcc
+os:
+- linux
+script:
+- cd src
+- g++ -g main.cpp uci.cpp board.cpp -o ../dist/DeepPigeon.exe"
+branches:
+  only:
+  - master

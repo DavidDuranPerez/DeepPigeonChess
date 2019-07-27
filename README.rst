@@ -1,4 +1,4 @@
-# This is Deep Pigeon, a chess engine written in C++
+This is Deep Pigeon, a chess engine written in C++
 ======================================================
 
 Copyright (C) 2019, David Duran
@@ -10,6 +10,7 @@ Build Instructions
 
 To create an executable of the chess engine:
 
+	cd src
 	g++ -g main.cpp uci.cpp board.cpp -o ../dist/DeepPigeon.exe"
 
 UCI implemented commands
