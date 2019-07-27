@@ -1,0 +1,41 @@
+# This is Deep Pigeon, a chess engine written in C++
+======================================================
+
+Copyright (C) 2019, David Duran
+
+.. contents::
+
+Build Instructions
+-------------------
+
+To create an executable of the chess engine:
+
+	g++ -g main.cpp uci.cpp board.cpp -o ../dist/DeepPigeon.exe"
+
+UCI implemented commands
+-------------------------
+
+This chess engine uses the Universal Chess Interface protocol for communication. The implemented commands are:
+
+- GUI to engine
+
+  * quit
+  * uci
+  * position fen [fen_str] moves [moves_str]
+  * position startpos moves [moves_str]
+
+- Engine to GUI
+
+  * id name
+  * id author
+  * uciok
+
+Testing
+----------
+
+TBD
+
+Issue Tracker and Mailing List
+--------------------------------
+
+Bug reports are welcome!  You can use the `issue tracker <https://github.com/DavidDuranPerez/DeepPigeonChess/issues>`_ to report bugs, and/or submit pull requests `on GitHub <https://github.com/DavidDuranPerez/DeepPigeonChess/pulls>`_.
