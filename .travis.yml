@@ -15,7 +15,8 @@ install:
 
 script:
 - cd src
-- g++ -g main.cpp uci.cpp board.cpp -std=c++11 -o ../dist/DeepPigeon.exe
+- g++ -g main.cpp uci.cpp board.cpp -std=c++11 -o DeepPigeon
+- ./DeepPigeon
 
 branches:
   only:
