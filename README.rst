@@ -15,7 +15,9 @@ Build Instructions
 To create an executable of the chess engine:
 
 	cd src
-	g++ -g main.cpp uci.cpp board.cpp -o ../dist/DeepPigeon.exe
+	g++ -g main.cpp uci.cpp board.cpp -std=c++11 -o ../dist/DeepPigeon.exe
+
+You can then run the program.
 
 UCI implemented commands
 -------------------------
