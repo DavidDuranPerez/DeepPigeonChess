@@ -36,6 +36,7 @@ class Board{
 public:
     // Constructor
     Board(std::string fen_string);
+    Board(); // Default one
     // Move
     void move(std::string fromto);
     // Print board

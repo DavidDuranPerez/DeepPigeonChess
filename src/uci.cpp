@@ -4,10 +4,12 @@
 */
 
 #include "uci.h"
-#include "board.h"
 
 // Constructor
 UCI::UCI(){
+  // Initialize the engine
+  //this->engine = Engine();
+
   // Set the initial time
   this->initial_time = time(0);
   std::cout << this->initial_time << "\n";
@@ -15,8 +17,8 @@ UCI::UCI(){
 
 // Get the information of the engine
 void UCI::engine_info(){
-  std::cout << this->engine_name << "\n";
-  std::cout << this->engine_copyright << ", " << this->engine_author << "\n\n";
+  std::cout << this->engine.engine_name << "\n";
+  std::cout << this->engine.engine_copyright << ", " << this->engine.engine_author << "\n\n";
 }
 
 // Get position
@@ -44,11 +46,11 @@ void UCI::get_position(std::stringstream& var_stream){
     return;
 
   // Pass the position to the engine
-  Board board = Board(fen_string);
+  this->engine.set_board(fen_string);
 
   // Make the moves (if any)
   while(var_stream >> arg_next)
-    board.move(arg_next);
+    this->engine.make_move(arg_next);
 }
 
 // The primary UCI communication loop
@@ -72,8 +74,8 @@ void UCI::comm_loop(){
     // Different commands
     if(command=="uci"){ // It tellsengine to use the uci communication
       // id
-      std::cout << "id name " << this->engine_name << " " << this->engine_version << "\n";
-      std::cout << "id author " << this->engine_author << "\n";
+      std::cout << "id name " << this->engine.engine_name << " " << this->engine.engine_version << "\n";
+      std::cout << "id author " << this->engine.engine_author << "\n";
       // For the moment, no option is available
       // uciok
       std::cout << "uciok" << "\n";

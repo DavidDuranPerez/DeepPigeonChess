@@ -47,6 +47,11 @@ void Square::set_piece(char piece)
     this->piece = piece;
 }
 
+// Default constructor
+Board::Board(){
+    this->debugging = true;
+}
+
 // Constructor for the board --> default initial position
 Board::Board(std::string fen_string)
 {

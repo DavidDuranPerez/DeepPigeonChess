@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "-g", "main.cpp", "uci.cpp", "board.cpp", "-std=c++11", "-o", "../dist/DeepPigeon.exe"
+                "-g", "main.cpp", "uci.cpp", "board.cpp", "engine.cpp", "-std=c++11", "-o", "../dist/DeepPigeon.exe"
             ],
             "group": {
                 "kind": "build",

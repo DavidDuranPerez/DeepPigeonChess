@@ -10,6 +10,9 @@
 #include <ctime>
 #include <string>
 
+// Own libraries
+#include "engine.h"
+
 // Main class
 class UCI
 {
@@ -24,11 +27,7 @@ public:
 
 private:
   // Parameters
-  std::string engine_name = "Deep Pigeon";
-  std::string engine_author = "David Duran";
-  std::string engine_copyright = "Copyright (C) 2019";
-  std::string engine_version = "0.1";
-
+  Engine engine=Engine();
   std::time_t initial_time;
 };
 
