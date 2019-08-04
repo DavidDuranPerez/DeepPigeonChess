@@ -41,6 +41,7 @@
         "tuple": "cpp",
         "vector": "cpp",
         "xmemory": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "string_view": "cpp"
     }
 }

@@ -18,8 +18,11 @@ class Square{
 public:
     // Constructor
     Square(int row=1, char column='a', char piece='R', bool is_valid=true);
-    // Get piece
+    // Gettters
     char get_piece();
+    char get_col(){return this->column;};
+    int get_row(){return this->row;};
+    bool get_valid(){return this->is_valid;};
     // Set piece
     void set_piece(char piece);
 
@@ -39,6 +42,14 @@ public:
     Board(); // Default one
     // Move
     void move(std::string fromto);
+    // Getters
+    int get_size(){return sizeof(this->squares) / sizeof(*this->squares);}; // Size
+    bool get_turn(){return this->white_moves;}; // White to move?
+    char get_piece(int i, int j){return this->squares[i][j].get_piece();}; // Get a piece of a square
+    int get_row(int i, int j){return this->squares[i][j].get_row();}; // Get a row of a square
+    char get_col(int i, int j){return this->squares[i][j].get_col();}; // Get a column of a square
+    bool is_valid(int i, int j){return this->squares[i][j].get_valid();}; // See if a square is valid
+
     // Print board
     void print_board();
 

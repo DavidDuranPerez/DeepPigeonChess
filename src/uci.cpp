@@ -87,7 +87,11 @@ void UCI::comm_loop(){
       this->get_position(var_stream);
     }
     else if(command=="go"){
-      // Pass several parameters to search
+      // Pass several parameters to search --> TBD!!!
+
+      // Start computing
+      this->engine.possible_moves();
+
       // Send info commands --> JUST AN EXAMPLE!!
       std::cout << "info depth 1 seldepth 0" << "\n";
 		  std::cout << "info score cp 13  depth 1 nodes 13 time 15 pv d2d4" << "\n"; 

@@ -88,6 +88,17 @@ void Board::move(std::string fromto)
     this->squares[row_from][col_from].set_piece(' ');
     this->squares[row_to][col_to].set_piece(piece_from);
 
+    // Promotion (if any)
+    if(fromto.length()>4){
+        if(this->white_moves){
+            this->squares[row_to][col_to].set_piece(toupper(fromto[4]));
+        }
+        else{
+            this->squares[row_to][col_to].set_piece(fromto[4]);
+        }
+    }
+
+
     // Change the turn
     this->white_moves = !this->white_moves;
 
