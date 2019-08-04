@@ -73,7 +73,14 @@ std::vector<std::string> Engine::possible_moves(){
         if(look4moves){
           std::vector<std::string> moves_piece;
           if(orig_piece=='p' || orig_piece=='P'){
+            // Pawn moves
             moves_piece = this->pawn_moves(i, j, white2move);
+            // Append this vector to the big one
+            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
+          }
+          else if(orig_piece=='r' || orig_piece=='R'){
+            // Rook moves
+            moves_piece = this->rook_moves(i, j, white2move);
             // Append this vector to the big one
             moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
           }
@@ -182,4 +189,102 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
   }
 
   return moves_pawn;
+}
+
+std::string Engine::rook_one_move(int i_target, int j_target, bool is_white){
+    // No capture
+    if(this->board.get_piece(i_target, j_target)==' ' && this->board.is_valid(i_target, j_target)){
+      return "move";
+    }
+
+    // Capture
+    if(is_white){
+      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q') && this->board.is_valid(i_target, j_target)){
+        return "capture";
+      }
+    }else{
+      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q') && this->board.is_valid(i_target, j_target)){
+        return "capture";
+      }
+    }
+
+    // Block
+    if(is_white){
+      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q') && this->board.is_valid(i_target, j_target)){
+        return "block";
+      }
+    }else{
+      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q') && this->board.is_valid(i_target, j_target)){
+        return "block";
+      }        
+    }
+
+    // Default
+    return "default";
+}
+
+std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
+  // Initialize the vector
+  std::vector<std::string> moves_rook={};
+
+  // Original square
+  std::string orig_sq=this->notate_square(i,j);
+
+  // Back movements
+  for(int ind=i-1; ind>=2; ind--){
+    // Target square
+    std::string target_sq=this->notate_square(ind,j);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->rook_one_move(ind, j, is_white);
+    if(decision=="block")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_rook.push_back(move);
+  }
+
+  // Forth movements
+  for(int ind=i+1; ind<=9; ind++){
+    // Target square
+    std::string target_sq=this->notate_square(ind,j);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->rook_one_move(ind, j, is_white);
+    if(decision=="block")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_rook.push_back(move);
+  }
+
+  // Left movements
+  for(int ind=j-1; ind>=2; ind--){
+    // Target square
+    std::string target_sq=this->notate_square(i,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->rook_one_move(i, ind, is_white);
+    if(decision=="block")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_rook.push_back(move);
+  }
+
+  // Right movements
+  for(int ind=j+1; ind<=9; ind++){
+    // Target square
+    std::string target_sq=this->notate_square(i,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->rook_one_move(i, ind, is_white);
+    if(decision=="block")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_rook.push_back(move);
+  }
+
+  return moves_rook;
 }
