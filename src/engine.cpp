@@ -84,6 +84,12 @@ std::vector<std::string> Engine::possible_moves(){
             // Append this vector to the big one
             moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
           }
+          else if(orig_piece=='b' || orig_piece=='B'){
+            // Rook moves
+            moves_piece = this->bishop_moves(i, j, white2move);
+            // Append this vector to the big one
+            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
+          }
         }
       }
   }
@@ -191,7 +197,11 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
   return moves_pawn;
 }
 
-std::string Engine::rook_one_move(int i_target, int j_target, bool is_white){
+std::string Engine::basic_move_capture(int i_target, int j_target, bool is_white){
+    // We do not event look if it is not valid
+    if(!this->board.is_valid(i_target, j_target))
+      return "invalid";
+
     // No capture
     if(this->board.get_piece(i_target, j_target)==' ' && this->board.is_valid(i_target, j_target)){
       return "move";
@@ -210,11 +220,11 @@ std::string Engine::rook_one_move(int i_target, int j_target, bool is_white){
 
     // Block
     if(is_white){
-      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q') && this->board.is_valid(i_target, j_target)){
+      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q' || this->board.get_piece(i_target, j_target)=='K') && this->board.is_valid(i_target, j_target)){
         return "block";
       }
     }else{
-      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q') && this->board.is_valid(i_target, j_target)){
+      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q' || this->board.get_piece(i_target, j_target)=='k') && this->board.is_valid(i_target, j_target)){
         return "block";
       }        
     }
@@ -230,29 +240,29 @@ std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
   // Original square
   std::string orig_sq=this->notate_square(i,j);
 
-  // Back movements
+  // Down movements
   for(int ind=i-1; ind>=2; ind--){
     // Target square
     std::string target_sq=this->notate_square(ind,j);
     std::string move=orig_sq+target_sq;
 
     // Decision of what to do with the target square
-    std::string decision=this->rook_one_move(ind, j, is_white);
-    if(decision=="block")
+    std::string decision=this->basic_move_capture(ind, j, is_white);
+    if(decision=="block" || decision=="invalid")
       break;
     else if(decision=="move" || decision=="capture")
       moves_rook.push_back(move);
   }
 
-  // Forth movements
+  // Up movements
   for(int ind=i+1; ind<=9; ind++){
     // Target square
     std::string target_sq=this->notate_square(ind,j);
     std::string move=orig_sq+target_sq;
 
     // Decision of what to do with the target square
-    std::string decision=this->rook_one_move(ind, j, is_white);
-    if(decision=="block")
+    std::string decision=this->basic_move_capture(ind, j, is_white);
+    if(decision=="block" || decision=="invalid")
       break;
     else if(decision=="move" || decision=="capture")
       moves_rook.push_back(move);
@@ -265,8 +275,8 @@ std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
     std::string move=orig_sq+target_sq;
 
     // Decision of what to do with the target square
-    std::string decision=this->rook_one_move(i, ind, is_white);
-    if(decision=="block")
+    std::string decision=this->basic_move_capture(i, ind, is_white);
+    if(decision=="block" || decision=="invalid")
       break;
     else if(decision=="move" || decision=="capture")
       moves_rook.push_back(move);
@@ -279,12 +289,86 @@ std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
     std::string move=orig_sq+target_sq;
 
     // Decision of what to do with the target square
-    std::string decision=this->rook_one_move(i, ind, is_white);
-    if(decision=="block")
+    std::string decision=this->basic_move_capture(i, ind, is_white);
+    if(decision=="block" || decision=="invalid")
       break;
     else if(decision=="move" || decision=="capture")
       moves_rook.push_back(move);
   }
 
   return moves_rook;
+}
+
+std::vector<std::string> Engine::bishop_moves(int i, int j, bool is_white){
+  // Initialize the vector
+  std::vector<std::string> moves_bishop={};
+
+  // Original square
+  std::string orig_sq=this->notate_square(i,j);
+
+  // Left-down movements
+  for(int ind=i-1; ind>=2; ind--){
+    // Difference of squares
+    int diff_squares = i-ind;
+    // Target square
+    std::string target_sq=this->notate_square(ind, j-diff_squares);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(ind, j-diff_squares, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_bishop.push_back(move);
+  }
+
+  // Right-up movements
+  for(int ind=i+1; ind<=9; ind++){
+    // Difference of squares
+    int diff_squares = ind-i;
+    // Target square
+    std::string target_sq=this->notate_square(ind, j+diff_squares);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(ind, j+diff_squares, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_bishop.push_back(move);
+  }
+
+  // Left-up movements
+  for(int ind=j-1; ind>=2; ind--){
+    // Difference of squares
+    int diff_squares = j-ind;
+    // Target square
+    std::string target_sq=this->notate_square(i+diff_squares,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(i+diff_squares, ind, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_bishop.push_back(move);
+  }
+
+  // Right-down movements
+  for(int ind=j+1; ind<=9; ind++){
+    // Difference of squares
+    int diff_squares = ind-j;
+    // Target square
+    std::string target_sq=this->notate_square(i-diff_squares,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(i-diff_squares, ind, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_bishop.push_back(move);
+  }
+
+  return moves_bishop;
 }
