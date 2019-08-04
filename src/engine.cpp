@@ -90,6 +90,12 @@ std::vector<std::string> Engine::possible_moves(){
             // Append this vector to the big one
             moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
           }
+          else if(orig_piece=='q' || orig_piece=='Q'){
+            // Rook moves
+            moves_piece = this->queen_moves(i, j, white2move);
+            // Append this vector to the big one
+            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
+          }
         }
       }
   }
@@ -371,4 +377,134 @@ std::vector<std::string> Engine::bishop_moves(int i, int j, bool is_white){
   }
 
   return moves_bishop;
+}
+
+std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
+  // Initialize the vector
+  std::vector<std::string> moves_queen={};
+
+  // Original square
+  std::string orig_sq=this->notate_square(i,j);
+
+  // Down movements
+  for(int ind=i-1; ind>=2; ind--){
+    // Target square
+    std::string target_sq=this->notate_square(ind,j);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(ind, j, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  // Up movements
+  for(int ind=i+1; ind<=9; ind++){
+    // Target square
+    std::string target_sq=this->notate_square(ind,j);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(ind, j, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  // Left movements
+  for(int ind=j-1; ind>=2; ind--){
+    // Target square
+    std::string target_sq=this->notate_square(i,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(i, ind, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  // Right movements
+  for(int ind=j+1; ind<=9; ind++){
+    // Target square
+    std::string target_sq=this->notate_square(i,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(i, ind, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  // Left-down movements
+  for(int ind=i-1; ind>=2; ind--){
+    // Difference of squares
+    int diff_squares = i-ind;
+    // Target square
+    std::string target_sq=this->notate_square(ind, j-diff_squares);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(ind, j-diff_squares, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  // Right-up movements
+  for(int ind=i+1; ind<=9; ind++){
+    // Difference of squares
+    int diff_squares = ind-i;
+    // Target square
+    std::string target_sq=this->notate_square(ind, j+diff_squares);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(ind, j+diff_squares, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  // Left-up movements
+  for(int ind=j-1; ind>=2; ind--){
+    // Difference of squares
+    int diff_squares = j-ind;
+    // Target square
+    std::string target_sq=this->notate_square(i+diff_squares,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(i+diff_squares, ind, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  // Right-down movements
+  for(int ind=j+1; ind<=9; ind++){
+    // Difference of squares
+    int diff_squares = ind-j;
+    // Target square
+    std::string target_sq=this->notate_square(i-diff_squares,ind);
+    std::string move=orig_sq+target_sq;
+
+    // Decision of what to do with the target square
+    std::string decision=this->basic_move_capture(i-diff_squares, ind, is_white);
+    if(decision=="block" || decision=="invalid")
+      break;
+    else if(decision=="move" || decision=="capture")
+      moves_queen.push_back(move);
+  }
+
+  return moves_queen;
 }
