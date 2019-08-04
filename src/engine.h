@@ -30,7 +30,7 @@ private:
     // Functions
     bool is_in_array(char ch, char (&arr)[6]); // Is the character in the array
     std::vector<std::string> pawn_moves(int i, int j, bool is_white); // Pawn moves from the position i,j
-    std::string basic_move_capture(int i_target, int j_target, bool is_white); // Basic move capture for rook, bishop, queen and king
+    std::string basic_move_capture(int i_target, int j_target, bool is_white); // It tells which kind of move it is (normal, capture, block, invalid...)
     std::vector<std::string> rook_moves(int i, int j, bool is_white); // Rook moves from the position i,j
     std::vector<std::string> knight_moves(int i, int j, bool is_white); // Knight moves from the position i,j
     std::vector<std::string> bishop_moves(int i, int j, bool is_white); // Bishop moves from the position i,j

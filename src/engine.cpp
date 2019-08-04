@@ -72,36 +72,41 @@ std::vector<std::string> Engine::possible_moves(){
         // Switch between all pieces
         if(look4moves){
           std::vector<std::string> moves_piece;
-          if(orig_piece=='p' || orig_piece=='P'){
-            // Pawn moves
-            moves_piece = this->pawn_moves(i, j, white2move);
-            // Append this vector to the big one
-            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
+          switch(orig_piece){
+            case 'p':
+            case 'P':
+              // Pawn moves
+              moves_piece = this->pawn_moves(i, j, white2move);
+              break;
+            case 'r':
+            case 'R':
+              // Rook moves
+              moves_piece = this->rook_moves(i, j, white2move);
+              break;
+            case 'b':
+            case 'B':
+              // Bishop moves
+              moves_piece = this->bishop_moves(i, j, white2move);
+              break;
+            case 'q':
+            case 'Q':
+              // Queen moves
+              moves_piece = this->queen_moves(i, j, white2move);
+              break;
+            case 'k':
+            case 'K':
+              // King moves
+              moves_piece = this->king_moves(i, j, white2move);
+              break;
+            case 'n':
+            case 'N':
+              // Knight moves
+              moves_piece = this->knight_moves(i, j, white2move);
+              break;
           }
-          else if(orig_piece=='r' || orig_piece=='R'){
-            // Rook moves
-            moves_piece = this->rook_moves(i, j, white2move);
-            // Append this vector to the big one
-            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
-          }
-          else if(orig_piece=='b' || orig_piece=='B'){
-            // Rook moves
-            moves_piece = this->bishop_moves(i, j, white2move);
-            // Append this vector to the big one
-            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
-          }
-          else if(orig_piece=='q' || orig_piece=='Q'){
-            // Rook moves
-            moves_piece = this->queen_moves(i, j, white2move);
-            // Append this vector to the big one
-            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
-          }
-          else if(orig_piece=='k' || orig_piece=='K'){
-            // Rook moves
-            moves_piece = this->king_moves(i, j, white2move);
-            // Append this vector to the big one
-            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
-          }
+
+          // Append this vector to the big one
+          moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
         }
       }
   }
@@ -194,13 +199,13 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
       moves_pawn.push_back(move);
     }
     // One square diagonal (capture)
-    if((this->board.get_piece(i-1, j+1)=='p' || this->board.get_piece(i-1, j+1)=='r' || this->board.get_piece(i-1, j+1)=='n' || this->board.get_piece(i-1, j+1)=='b' || this->board.get_piece(i-1, j+1)=='q') && this->board.is_valid(i-1, j+1)){
+    if((this->board.get_piece(i-1, j+1)=='P' || this->board.get_piece(i-1, j+1)=='R' || this->board.get_piece(i-1, j+1)=='N' || this->board.get_piece(i-1, j+1)=='B' || this->board.get_piece(i-1, j+1)=='Q') && this->board.is_valid(i-1, j+1)){
       std::string target_sq=this->notate_square(i+1,j+1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
     }
     // One square diagonal (capture)
-    if((this->board.get_piece(i-1, j-1)=='p' || this->board.get_piece(i-1, j-1)=='r' || this->board.get_piece(i-1, j-1)=='n' || this->board.get_piece(i-1, j-1)=='b' || this->board.get_piece(i-1, j-1)=='q') && this->board.is_valid(i-1, j-1)){
+    if((this->board.get_piece(i-1, j-1)=='P' || this->board.get_piece(i-1, j-1)=='R' || this->board.get_piece(i-1, j-1)=='N' || this->board.get_piece(i-1, j-1)=='B' || this->board.get_piece(i-1, j-1)=='Q') && this->board.is_valid(i-1, j-1)){
       std::string target_sq=this->notate_square(i-1,j-1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
@@ -598,4 +603,86 @@ std::vector<std::string> Engine::king_moves(int i, int j, bool is_white){
     moves_king.push_back(move);
 
   return moves_king;
+}
+
+std::vector<std::string> Engine::knight_moves(int i, int j, bool is_white){
+  // Initialize the vector
+  std::vector<std::string> moves_knight={};
+
+  // Original square
+  std::string orig_sq=this->notate_square(i,j);
+
+  // Vertical up-right L
+  // Target square
+  std::string target_sq=this->notate_square(i+2,j+1);
+  std::string move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  std::string decision=this->basic_move_capture(i+2,j+1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  // Vertical up-left L
+  // Target square
+  target_sq=this->notate_square(i+2,j-1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i+2,j-1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  // Horizontal up-right L
+  // Target square
+  target_sq=this->notate_square(i+1,j+2);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i+1,j+2, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  // Horizontal up-left L
+  // Target square
+  target_sq=this->notate_square(i+1,j-2);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i+1,j-2, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  // Vertical down-right L
+  // Target square
+  target_sq=this->notate_square(i-2,j+1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i-2,j+1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  // Vertical down-left L
+  // Target square
+  target_sq=this->notate_square(i-2,j-1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i-2,j-1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  // Horizontal down-right L
+  // Target square
+  target_sq=this->notate_square(i-1,j+2);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i-1,j+2, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  // Horizontal down-left L
+  // Target square
+  target_sq=this->notate_square(i-1,j-2);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i-1,j-2, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_knight.push_back(move);
+
+  return moves_knight;
 }
