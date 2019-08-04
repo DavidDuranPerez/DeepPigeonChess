@@ -96,11 +96,18 @@ std::vector<std::string> Engine::possible_moves(){
             // Append this vector to the big one
             moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
           }
+          else if(orig_piece=='k' || orig_piece=='K'){
+            // Rook moves
+            moves_piece = this->king_moves(i, j, white2move);
+            // Append this vector to the big one
+            moves.insert(moves.end(), moves_piece.begin(), moves_piece.end());
+          }
         }
       }
   }
 
   if(this->debugging){
+    std::cout << "There are " << moves.size() << " possible moves:" << "\n";
     for(std::size_t i=0; i<moves.size(); ++i) 
       std::cout << moves[i] << '\n'; 
   }
@@ -507,4 +514,88 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
   }
 
   return moves_queen;
+}
+
+std::vector<std::string> Engine::king_moves(int i, int j, bool is_white){
+  // Castling not yet implemented!!!!!!!!!!!
+
+  // Initialize the vector
+  std::vector<std::string> moves_king={};
+
+  // Original square
+  std::string orig_sq=this->notate_square(i,j);
+
+  // Down movement
+  // Target square
+  std::string target_sq=this->notate_square(i-1,j);
+  std::string move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  std::string decision=this->basic_move_capture(i-1, j, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  // Up movement
+  // Target square
+  target_sq=this->notate_square(i+1,j);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i+1, j, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  // Left movements
+  // Target square
+  target_sq=this->notate_square(i,j-1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i, j-1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  // Right movements
+  // Target square
+  target_sq=this->notate_square(i,j+1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i, j+1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  // Left-down movements
+  // Target square
+  target_sq=this->notate_square(i-1, j-1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i-1, j-1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  // Right-up movements
+  // Target square
+  target_sq=this->notate_square(i+1, j+1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i+1, j+1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  // Left-up movements
+  // Target square
+  target_sq=this->notate_square(i+1,j-1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i+1, j-1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  // Right-down movements
+  // Target square
+  target_sq=this->notate_square(i-1,j+1);
+  move=orig_sq+target_sq;
+  // Decision of what to do with the target square
+  decision=this->basic_move_capture(i-1,j+1, is_white);
+  if(decision=="move" || decision=="capture")
+    moves_king.push_back(move);
+
+  return moves_king;
 }
