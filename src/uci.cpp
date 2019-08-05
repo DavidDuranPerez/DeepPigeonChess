@@ -53,6 +53,74 @@ void UCI::get_position(std::stringstream& var_stream){
     this->engine.make_move(arg_next);
 }
 
+// Get go commands
+void UCI::get_go(std::stringstream& var_stream){
+  std::string arg_next, arg_val; // First argument and next one
+  
+  // Initialize the parameters first
+  this->engine.initialize_parameters();
+  
+  // Iterate all the commands
+  while(var_stream >> arg_next)
+  {
+    if(arg_next=="searchmoves")
+    {
+      // The searchmoves are at the end
+      while(var_stream >> arg_val)
+        this->engine.set_searchmove(arg_val);
+    }
+    else if(arg_next=="infinite")
+      this->engine.activate_infinite();
+    else if(arg_next=="ponder")
+      this->engine.activate_ponder();
+    else if(arg_next =="wtime"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_wtime(std::atof(arg_val.c_str()));
+    }
+    else if(arg_next =="btime"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_btime(std::atof(arg_val.c_str()));
+    }
+    else if(arg_next =="winc"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_winc(std::atof(arg_val.c_str()));
+    }
+    else if(arg_next =="binc"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_binc(std::atof(arg_val.c_str()));
+    }
+    else if(arg_next =="movetime"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_movetime(std::atof(arg_val.c_str()));
+    }
+    else if(arg_next =="movestogo"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_movestogo(std::atoi(arg_val.c_str()));
+    }
+    else if(arg_next =="depth"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_depth(std::atoi(arg_val.c_str()));
+    }
+    else if(arg_next =="nodes"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_nodes(std::atoi(arg_val.c_str()));
+    }
+    else if(arg_next =="mate"){
+      // Consume the value
+      var_stream >> arg_val;
+      this->engine.set_mate(std::atoi(arg_val.c_str()));
+    }
+  }
+}
+
 // The primary UCI communication loop
 void UCI::comm_loop(){
   // Variable representing the command from the GUI
@@ -84,13 +152,15 @@ void UCI::comm_loop(){
       // It should clear any search
     }
     else if(command=="position"){
+      // Get the position with all the arguments
       this->get_position(var_stream);
     }
     else if(command=="go"){
-      // Pass several parameters to search --> TBD!!!
+      // Pass several parameters to search
+      this->get_go(var_stream);
 
       // Start computing
-      this->engine.possible_moves();
+      this->engine.compute();
 
       // Send info commands --> JUST AN EXAMPLE!!
       std::cout << "info depth 1 seldepth 0" << "\n";

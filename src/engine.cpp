@@ -20,6 +20,28 @@ void Engine::make_move(std::string move){
     this->board.move(move);
 }
 
+// Initialize parameters
+void Engine::initialize_parameters(){
+  this->searchmoves.clear();
+  this->ponder=false;
+  this->wtime=-1.0;
+  this->btime=-1.0;
+  this->winc=-1.0;
+  this->binc=-1.0;
+  this->movestogo=0;
+  this->depth=0;
+  this->nodes=0;
+  this->mate=0;
+  this->movetime=-1.0;
+  this->infinite=false;
+}
+
+// Compute the best move
+void Engine::compute(){
+  // See the possible moves
+  std::vector<std::string> legal_moves = this->possible_moves();
+}
+
 // Is the character in the array
 bool Engine::is_in_array(char ch, char (&arr)[6]){
   bool found=false;
