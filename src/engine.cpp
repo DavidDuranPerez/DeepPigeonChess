@@ -38,8 +38,16 @@ void Engine::initialize_parameters(){
 
 // Compute the best move
 void Engine::compute(){
+  // See the checked moves
+  std::vector<std::string> check_moves = this->check_moves(this->board.get_turn());
+  if(this->debugging){
+    std::cout << "Check moves:" << "\n";
+    for(std::size_t i=0; i<check_moves.size(); ++i) 
+        std::cout << check_moves[i] << '\n'; 
+  }
+
   // See the possible moves
-  std::vector<std::string> legal_moves = this->possible_moves();
+  std::vector<std::string> legal_moves = this->possible_moves(this->board.get_turn(), this->debugging, check_moves);
 
   // Set a random move as the best one
   int randomindex = rand() % legal_moves.size();
@@ -47,6 +55,42 @@ void Engine::compute(){
 
   // Get best move
   this->get_bestmove();
+}
+
+std::vector<std::string> Engine::check_moves(bool white2move){
+  // Get the position of the king
+  std::string target_square=this->find_king(white2move);
+
+  // Get all the possible moves from the opponent (black if white turn, white if black turn)
+  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false, {});
+
+  // Return the moves with the target square in the legal moves
+  return this->moves_in_vector(target_square, legal_moves);
+}
+
+// Find the square of the king
+std::string Engine::find_king(bool white2move){
+  // Piece to find
+  char piece2find;
+  if(white2move)
+    piece2find='K';
+  else
+    piece2find = 'k';
+
+  // Size of the board
+  int board_size = this->board.get_size();
+
+  // Make the double loop to search the piece
+  for (int i = 2; i < board_size-2; i++)
+  { // row
+      for (int j = 2; j < board_size-2; j++)
+      { // column
+        if(this->board.get_piece(i,j)==piece2find)
+          return this->notate_square(i, j);
+      }
+  }
+
+  return "error";
 }
 
 // Is the character in the array
@@ -59,15 +103,29 @@ bool Engine::is_in_array(char ch, char (&arr)[6]){
   return found;
 }
 
+// Is the target square in the vector
+std::vector<std::string> Engine::moves_in_vector(std::string target, std::vector<std::string> v){
+  std::vector<std::string> moves;
+  for(int i=0; i<v.size(); i++){
+    // Get variables to compare
+    char col_target = target[0];
+    char col_move = v[i][2];
+    char row_target = target[1];
+    char row_move = v[i][3];
+    if(col_target==col_move && row_target==row_move)
+      moves.push_back(v[i]);
+  }
+  return moves;
+}
+
 // Get a list of all possible moves
-std::vector<std::string> Engine::possible_moves(){
+std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves, std::vector<std::string> check_moves){
   // Initialize the vector
   std::vector<std::string> moves={};
+  std::vector<std::string> moves_definitive={};
 
   // Size of the board
   int board_size = this->board.get_size();
-  // White to move?
-  bool white2move = this->board.get_turn();
 
   // Pieces to look for
   char pieces2look[6];
@@ -140,14 +198,45 @@ std::vector<std::string> Engine::possible_moves(){
       }
   }
 
-  if(this->debugging){
-    std::cout << "There are " << moves.size() << " possible moves:" << "\n";
-    for(std::size_t i=0; i<moves.size(); ++i) 
-      std::cout << moves[i] << '\n'; 
+  // From all these possible moves, we have to delete the ones not helping to get out of a check if there is any
+  // If we have no possible escape, it is checkmate
+  if(check_moves.size()>0){
+    // Get original board so that we do not loss it
+    bool white2move=this->board.get_turn();
+    Board board_original=this->board;
+
+    // Loop all the possible moves
+    for(int i=0; i<moves.size(); i++){
+      // See if it gets out of all checks by making the move
+      this->make_move(moves[i]);
+      std::vector<std::string> check_moves2 = this->check_moves(white2move);
+
+      // Append it if there is no check_move
+      if(check_moves2.size()==0){
+        moves_definitive.push_back(moves[i]);
+      }
+      
+      // Get back to the original board
+      this->board=board_original;
+    }
+  }
+  else{
+    moves_definitive = moves;
+  }
+
+  // We are in checkmate
+  if(moves_definitive.size()==0){
+    this->checkmated=true;
+  }
+
+  if(show_moves){
+    std::cout << "There are " << moves_definitive.size() << " possible moves:" << "\n";
+    for(std::size_t i=0; i<moves_definitive.size(); ++i) 
+      std::cout << moves_definitive[i] << '\n'; 
   }
 
   // Return the list
-  return moves;
+  return moves_definitive;
 };
 
 // Notate a square
@@ -192,14 +281,14 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
     }
-    // One square diagonal (capture)
-    if((this->board.get_piece(i+1, j+1)=='p' || this->board.get_piece(i+1, j+1)=='r' || this->board.get_piece(i+1, j+1)=='n' || this->board.get_piece(i+1, j+1)=='b' || this->board.get_piece(i+1, j+1)=='q') && this->board.is_valid(i+1, j+1)){
+    // One square diagonal (capture) --> king capture should never happen unless checkmate
+    if((this->board.get_piece(i+1, j+1)=='p' || this->board.get_piece(i+1, j+1)=='r' || this->board.get_piece(i+1, j+1)=='n' || this->board.get_piece(i+1, j+1)=='b' || this->board.get_piece(i+1, j+1)=='q' || this->board.get_piece(i+1, j-1)=='k') && this->board.is_valid(i+1, j+1)){
       std::string target_sq=this->notate_square(i+1,j+1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
     }
-    // One square diagonal (capture)
-    if((this->board.get_piece(i+1, j-1)=='p' || this->board.get_piece(i+1, j-1)=='r' || this->board.get_piece(i+1, j-1)=='n' || this->board.get_piece(i+1, j-1)=='b' || this->board.get_piece(i+1, j-1)=='q') && this->board.is_valid(i+1, j-1)){
+    // One square diagonal (capture) --> king capture should never happen unless checkmate
+    if((this->board.get_piece(i+1, j-1)=='p' || this->board.get_piece(i+1, j-1)=='r' || this->board.get_piece(i+1, j-1)=='n' || this->board.get_piece(i+1, j-1)=='b' || this->board.get_piece(i+1, j-1)=='q' || this->board.get_piece(i+1, j-1)=='k') && this->board.is_valid(i+1, j-1)){
       std::string target_sq=this->notate_square(i+1,j-1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
@@ -227,14 +316,14 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
     }
-    // One square diagonal (capture)
-    if((this->board.get_piece(i-1, j+1)=='P' || this->board.get_piece(i-1, j+1)=='R' || this->board.get_piece(i-1, j+1)=='N' || this->board.get_piece(i-1, j+1)=='B' || this->board.get_piece(i-1, j+1)=='Q') && this->board.is_valid(i-1, j+1)){
+    // One square diagonal (capture) --> king capture should never happen unless checkmate
+    if((this->board.get_piece(i-1, j+1)=='P' || this->board.get_piece(i-1, j+1)=='R' || this->board.get_piece(i-1, j+1)=='N' || this->board.get_piece(i-1, j+1)=='B' || this->board.get_piece(i-1, j+1)=='Q' || this->board.get_piece(i-1, j+1)=='K') && this->board.is_valid(i-1, j+1)){
       std::string target_sq=this->notate_square(i+1,j+1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
     }
-    // One square diagonal (capture)
-    if((this->board.get_piece(i-1, j-1)=='P' || this->board.get_piece(i-1, j-1)=='R' || this->board.get_piece(i-1, j-1)=='N' || this->board.get_piece(i-1, j-1)=='B' || this->board.get_piece(i-1, j-1)=='Q') && this->board.is_valid(i-1, j-1)){
+    // One square diagonal (capture) --> king capture should never happen unless checkmate
+    if((this->board.get_piece(i-1, j-1)=='P' || this->board.get_piece(i-1, j-1)=='R' || this->board.get_piece(i-1, j-1)=='N' || this->board.get_piece(i-1, j-1)=='B' || this->board.get_piece(i-1, j-1)=='Q' || this->board.get_piece(i-1, j+1)=='K') && this->board.is_valid(i-1, j-1)){
       std::string target_sq=this->notate_square(i-1,j-1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
@@ -254,13 +343,13 @@ std::string Engine::basic_move_capture(int i_target, int j_target, bool is_white
       return "move";
     }
 
-    // Capture
+    // Capture --> king capture should never happen unless checkmate
     if(is_white){
-      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q') && this->board.is_valid(i_target, j_target)){
+      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q' || this->board.get_piece(i_target, j_target)=='k') && this->board.is_valid(i_target, j_target)){
         return "capture";
       }
     }else{
-      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q') && this->board.is_valid(i_target, j_target)){
+      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q' || this->board.get_piece(i_target, j_target)=='K') && this->board.is_valid(i_target, j_target)){
         return "capture";
       }
     }
@@ -297,7 +386,11 @@ std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_rook.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_rook.push_back(move);
   }
 
@@ -311,7 +404,11 @@ std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_rook.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_rook.push_back(move);
   }
 
@@ -325,7 +422,11 @@ std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_rook.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_rook.push_back(move);
   }
 
@@ -339,7 +440,11 @@ std::vector<std::string> Engine::rook_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_rook.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_rook.push_back(move);
   }
 
@@ -365,7 +470,11 @@ std::vector<std::string> Engine::bishop_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j-diff_squares, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_bishop.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_bishop.push_back(move);
   }
 
@@ -381,7 +490,11 @@ std::vector<std::string> Engine::bishop_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j+diff_squares, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_bishop.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_bishop.push_back(move);
   }
 
@@ -397,7 +510,11 @@ std::vector<std::string> Engine::bishop_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i+diff_squares, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_bishop.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_bishop.push_back(move);
   }
 
@@ -413,7 +530,11 @@ std::vector<std::string> Engine::bishop_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i-diff_squares, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_bishop.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_bishop.push_back(move);
   }
 
@@ -437,7 +558,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
@@ -451,7 +576,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
@@ -465,7 +594,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
@@ -479,7 +612,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
@@ -495,7 +632,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j-diff_squares, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
@@ -511,7 +652,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(ind, j+diff_squares, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
@@ -527,7 +672,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i+diff_squares, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
@@ -543,7 +692,11 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
     std::string decision=this->basic_move_capture(i-diff_squares, ind, is_white);
     if(decision=="block" || decision=="invalid")
       break;
-    else if(decision=="move" || decision=="capture")
+    else if(decision=="capture"){
+      moves_queen.push_back(move);
+      break;
+    }
+    else if(decision=="move")
       moves_queen.push_back(move);
   }
 
