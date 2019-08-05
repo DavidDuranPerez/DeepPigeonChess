@@ -44,6 +44,9 @@ public:
     // Initialize parameters
     void initialize_parameters();
 
+    // Get best move
+    void get_bestmove(){std::cout << "bestmove " << this->bestmove << "\n";};
+
 private:
     // Functions
     bool is_in_array(char ch, char (&arr)[6]); // Is the character in the array
@@ -60,6 +63,7 @@ private:
     Board board;
     bool debugging; // For debugging purposes
 
+    // Options/Limits
     std::vector<std::string> searchmoves; // Not used yet!!!!!
     bool ponder=false; // Ponder mode. Not used yet!!!!!!!!
     double wtime=-1.0; // Time left for white (msec). Not used yet!!!!!!!!
@@ -72,6 +76,9 @@ private:
     int mate=0; // Search for a mate in x moves. Not used yet!!!!!!!!
     double movetime=-1.0; // Search exactly during x msec. Not used yet!!!!!!!!!
     bool infinite=false; // Search until the "stop" command. Not used yet!!!!!!!!
+
+    // Results
+    std::string bestmove;
 };
 
 #endif

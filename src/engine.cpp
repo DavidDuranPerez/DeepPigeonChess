@@ -40,6 +40,13 @@ void Engine::initialize_parameters(){
 void Engine::compute(){
   // See the possible moves
   std::vector<std::string> legal_moves = this->possible_moves();
+
+  // Set a random move as the best one
+  int randomindex = rand() % legal_moves.size();
+  this->bestmove = legal_moves[randomindex];
+
+  // Get best move
+  this->get_bestmove();
 }
 
 // Is the character in the array

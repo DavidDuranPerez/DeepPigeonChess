@@ -59,7 +59,7 @@ void UCI::get_go(std::stringstream& var_stream){
   
   // Initialize the parameters first
   this->engine.initialize_parameters();
-  
+
   // Iterate all the commands
   while(var_stream >> arg_next)
   {
@@ -168,8 +168,9 @@ void UCI::comm_loop(){
     }
     else if(command=="stop"){
       // Stop searching
-      // Send the best move --> JUST AN EXAMPLE!!
-      std::cout << "bestmove d2d4" << "\n";
+      
+      // Send the best move
+      this->engine.get_bestmove();
     }
     else if(command=="isready"){
       // Finish anything that is doing
