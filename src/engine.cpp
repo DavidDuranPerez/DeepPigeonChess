@@ -62,10 +62,25 @@ std::vector<std::string> Engine::check_moves(bool white2move){
   std::string target_square=this->find_king(white2move);
 
   // Get all the possible moves from the opponent (black if white turn, white if black turn)
-  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false, {});
+  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false);
 
   // Return the moves with the target square in the legal moves
   return this->moves_in_vector(target_square, legal_moves);
+}
+
+// Moves from black that prevent a castle (aiming at key squares)
+bool Engine::aim_castle(bool white2move, std::vector<std::string> key_squares){
+  // Get all the possible moves from the opponent (black if white turn, white if black turn)
+  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false, {}, false);
+
+  // Return the moves with the target square in the legal moves
+  for(int i=0; i<key_squares.size(); i++){
+    std::vector<std::string> moves_square = this->moves_in_vector(key_squares[i], legal_moves);
+    if(moves_square.size()>0)
+      return true;
+  }
+
+  return false;
 }
 
 // Find the square of the king
@@ -119,7 +134,7 @@ std::vector<std::string> Engine::moves_in_vector(std::string target, std::vector
 }
 
 // Get a list of all possible moves
-std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves, std::vector<std::string> check_moves){
+std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves, std::vector<std::string> check_moves/*={}*/, bool check_castling/*=true*/){
   // Initialize the vector
   std::vector<std::string> moves={};
   std::vector<std::string> moves_definitive={};
@@ -183,7 +198,7 @@ std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves
             case 'k':
             case 'K':
               // King moves
-              moves_piece = this->king_moves(i, j, white2move);
+              moves_piece = this->king_moves(i, j, white2move, check_castling);
               break;
             case 'n':
             case 'N':
@@ -703,9 +718,7 @@ std::vector<std::string> Engine::queen_moves(int i, int j, bool is_white){
   return moves_queen;
 }
 
-std::vector<std::string> Engine::king_moves(int i, int j, bool is_white){
-  // Castling not yet implemented!!!!!!!!!!!
-
+std::vector<std::string> Engine::king_moves(int i, int j, bool is_white, bool check_castling/*=true*/){
   // Initialize the vector
   std::vector<std::string> moves_king={};
 
@@ -783,6 +796,30 @@ std::vector<std::string> Engine::king_moves(int i, int j, bool is_white){
   decision=this->basic_move_capture(i-1,j+1, is_white);
   if(decision=="move" || decision=="capture")
     moves_king.push_back(move);
+
+  // Castling can be done if: allowed (king and rook not moved before), empty squares between king and rook, and no enemy piece aiming at key squares
+  if(check_castling){
+    // White castles
+    if(is_white){
+      // Short castle
+      bool test=this->aim_castle(is_white, {"e1", "f1", "g1"});
+      if(this->board.is_castle_allowed('K') && this->board.get_piece(2, 7)==' ' && this->board.get_piece(2, 8)==' ' && !this->aim_castle(is_white, {"e1", "f1", "g1"}))
+        moves_king.push_back("e1g1");
+
+      // Long castle
+      if(this->board.is_castle_allowed('Q') && this->board.get_piece(2, 3)==' ' && this->board.get_piece(2, 4)==' ' && this->board.get_piece(2, 5)==' ' && !this->aim_castle(is_white, {"e1", "d1", "c1"}))
+        moves_king.push_back("e1c1");
+    }
+    else{ // Black castles
+      // Short castle
+      if(this->board.is_castle_allowed('k') && this->board.get_piece(9, 7)==' ' && this->board.get_piece(9, 8)==' ' && !this->aim_castle(is_white, {"e8", "f8", "g8"}))
+        moves_king.push_back("e8g8");
+
+      // Long castle
+      if(this->board.is_castle_allowed('q') && this->board.get_piece(9, 3)==' ' && this->board.get_piece(9, 4)==' ' && this->board.get_piece(9, 5)==' ' && !this->aim_castle(is_white, {"e8", "d8", "c8"}))
+        moves_king.push_back("e8c8");
+    }
+  }
 
   return moves_king;
 }

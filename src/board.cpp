@@ -62,6 +62,25 @@ Board::Board(std::string fen_string)
     this->fen2pos(fen_string);
 }
 
+// Subtract a character from a string
+std::string Board::subtract_character(std::string orig_str, char ch2remove){
+    std::string mod_str="";
+    for(int i=0; i<orig_str.length(); i++){
+        if(orig_str[i]!=ch2remove)
+            mod_str+=orig_str[i];
+    }
+    return mod_str;
+}
+
+// See if a type of castle is allowed
+bool Board::is_castle_allowed(char type_castle){
+    for(int i=0; i<this->allowed_castles.length(); i++){
+        if(this->allowed_castles[i]==type_castle)
+            return true;
+    }
+    return false;
+}
+
 // Move
 // This function assumes that the move is legal. It is not the responsibility of this function to check if it is legal
 void Board::move(std::string fromto)
@@ -88,6 +107,63 @@ void Board::move(std::string fromto)
     this->squares[row_from][col_from].set_piece(' ');
     this->squares[row_to][col_to].set_piece(piece_from);
 
+    // Castling
+    if(fromto=="e1g1"){ // Short castling for white
+        // Change the piece
+        this->squares[2][9].set_piece(' ');
+        this->squares[2][7].set_piece('R');
+        // Modify the allowed castles
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
+    }
+    else if(fromto=="e1c1"){ // Long castling for white
+        // Change the piece
+        this->squares[2][2].set_piece(' ');
+        this->squares[2][5].set_piece('R');
+        // Modify the allowed castles
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
+    }
+    else if(fromto=="e8g8"){ // Short castling for black
+        // Change the piece
+        this->squares[9][9].set_piece(' ');
+        this->squares[9][7].set_piece('R');
+        // Modify the allowed castles
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
+    }
+    else if(fromto=="e8c8"){ // Long castling for black
+        // Change the piece
+        this->squares[9][2].set_piece(' ');
+        this->squares[9][5].set_piece('R');
+        // Modify the allowed castles
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
+        this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
+    }
+    else{
+        // Cases where the castle is not allowed anymore (a check is not included since it is allowed if afterwards not in check)
+        if(piece_from=='K'){ // White king moves
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
+        }
+        else if(piece_from=='k'){ // Black king moves
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');  
+        }
+        else if(piece_from=='R' && col_from==2 && row_from==2){ // White long rook
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
+        }
+        else if(piece_from=='R' && col_from==9 && row_from==2){ // White short rook
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
+        }
+        else if(piece_from=='r' && col_from==2 && row_from==9){ // Black long rook
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
+        }
+        else if(piece_from=='r' && col_from==9 && row_from==9){ // Black short rook
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
+        }
+    }
+
     // Promotion (if any)
     if(fromto.length()>4){
         if(this->white_moves){
@@ -98,11 +174,8 @@ void Board::move(std::string fromto)
         }
     }
 
-
     // Change the turn
     this->white_moves = !this->white_moves;
-
-    // Allowed castles --> TBD!!!
 
     // En passant --> TBD!!!
 

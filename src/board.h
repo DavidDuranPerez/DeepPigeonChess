@@ -49,6 +49,7 @@ public:
     int get_row(int i, int j){return this->squares[i][j].get_row();}; // Get a row of a square
     char get_col(int i, int j){return this->squares[i][j].get_col();}; // Get a column of a square
     bool is_valid(int i, int j){return this->squares[i][j].get_valid();}; // See if a square is valid
+    bool is_castle_allowed(char type_castle); // See if a type of castle is allowed
 
     // Print board
     void print_board();
@@ -65,6 +66,7 @@ private:
 
     // Convert FEN to position
     void fen2pos(std::string fen_str);
+    std::string subtract_character(std::string orig_str, char ch2remove);
 
     // Convert FEN row to fixed 8
     std::string convert_fenrow(std::string fen_row);
