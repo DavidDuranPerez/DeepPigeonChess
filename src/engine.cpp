@@ -39,8 +39,8 @@ void Engine::initialize_parameters(){
 // Compute the best move
 void Engine::compute(){
   // See the checked moves
-  std::vector<std::string> check_moves = this->check_moves(this->board.get_turn());
   if(this->debugging){
+    std::vector<std::string> check_moves = this->check_moves(this->board.get_turn());
     std::cout << "Check moves:" << "\n";
     for(std::size_t i=0; i<check_moves.size(); ++i) 
         std::cout << check_moves[i] << '\n'; 
@@ -49,9 +49,57 @@ void Engine::compute(){
   // See the possible moves
   std::vector<std::string> legal_moves = this->possible_moves(this->board.get_turn(), this->debugging, true);
 
-  // Set a random move as the best one
-  int randomindex = rand() % legal_moves.size();
-  this->bestmove = legal_moves[randomindex];
+  // Initialize the nodes
+  this->searched_nodes={};
+
+  // Evaluate each node at the given depth
+  Evaluation eval=Evaluation();
+  // Get original board so that we do not loss it
+  Board board_original=this->board;
+  for(size_t i=0; i<legal_moves.size(); i++){
+    // Make the move
+    this->make_move(legal_moves[i], false);
+
+    // Evaluate the position
+    Node node;
+    node.move=legal_moves[i];
+    node.score=eval.eval_pos(this->board);
+
+    // Save the node
+    this->searched_nodes.push_back(node);
+    
+    // Get back to the original board
+    this->board=board_original;
+  }
+
+  // Search for the node with more score
+  bool white2move=this->board.get_turn();
+  double max_score;
+  if(white2move)
+    max_score=-100000;
+  else
+    max_score=100000;
+  int max_ind=0;
+  for(size_t i=0; i<this->searched_nodes.size(); i++){
+    // For white search the maximum
+    if(white2move){
+      if(this->searched_nodes[i].score>max_score){
+        max_score=this->searched_nodes[i].score;
+        max_ind=i;
+      }
+    }
+    else{ // For black we have to search the minimum
+      if(this->searched_nodes[i].score<max_score){
+        max_score=this->searched_nodes[i].score;
+        max_ind=i;
+      }
+    }
+  }
+  this->bestmove = this->searched_nodes[max_ind].move;
+
+  // Random move
+  //int randomindex = rand() % this->searched_nodes.size();
+  //this->bestmove = this->searched_nodes[randomindex].move;
 
   // Get best move
   this->get_bestmove();

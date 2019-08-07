@@ -10,6 +10,15 @@
 
 // Own libraries
 #include "board.h"
+#include "evaluation.h"
+
+// Structure representing a node (every time you make a possible move and evaluate it)
+struct Node{
+  std::string move="";
+  double score=0.0;
+  int depth=1; // Number of halfmoves
+  std::string previous_moves=""; // A string representing the parents of this node (if any)
+};
 
 
 // Class for the engine
@@ -82,6 +91,7 @@ private:
     bool infinite=false; // Search until the "stop" command. Not used yet!!!!!!!!
 
     // Results
+    std::vector<Node> searched_nodes; // List of nodes with their score
     std::string bestmove;
     bool checkmated=false;
 };
