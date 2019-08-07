@@ -81,6 +81,20 @@ bool Board::is_castle_allowed(char type_castle){
     return false;
 }
 
+// Check if a square is a target en-passant square
+bool Board::is_enpassant(int i, int j){
+    if(this->en_passant_target=="-")
+        return false;
+    else{
+        int col_enpassant = col_map_reverse[this->en_passant_target[0]];
+        int row_enpassant = (int)this->en_passant_target[1] - '0' + 1;
+        if(row_enpassant==i && col_enpassant==j)
+            return true;
+        else
+            return false;
+    }
+}
+
 // Move
 // This function assumes that the move is legal. It is not the responsibility of this function to check if it is legal
 void Board::move(std::string fromto)
@@ -177,7 +191,26 @@ void Board::move(std::string fromto)
     // Change the turn
     this->white_moves = !this->white_moves;
 
-    // En passant --> TBD!!!
+    // Capture En passant -> we have to remove the captured pawn
+    if((piece_from=='P' || piece_from=='p') && col_from!=col_to && (to[0]==this->en_passant_target[0] && to[1]==this->en_passant_target[1])){
+        if(piece_from=='P')
+            this->squares[row_to-1][col_to].set_piece(' ');
+        else if(piece_from=='p')
+            this->squares[row_to+1][col_to].set_piece(' ');
+    }
+
+    // Record En passant target square
+    std::stringstream ss;
+    if(piece_from=='P' && row_from==3 && row_to==5){
+        ss << 3;
+        this->en_passant_target=from[0]+ss.str();
+    }
+    else if(piece_from=='p' && row_from==8 && row_to==6){
+        ss << 6;
+        this->en_passant_target=from[0]+ss.str();
+    }
+    else
+        this->en_passant_target='-'; // Empty this again
 
     // Full moves
     if (this->white_moves)

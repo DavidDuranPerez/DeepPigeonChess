@@ -50,6 +50,7 @@ public:
     char get_col(int i, int j){return this->squares[i][j].get_col();}; // Get a column of a square
     bool is_valid(int i, int j){return this->squares[i][j].get_valid();}; // See if a square is valid
     bool is_castle_allowed(char type_castle); // See if a type of castle is allowed
+    bool is_enpassant(int i, int j); // Check if a square is a target en-passant square
 
     // Print board
     void print_board();
