@@ -141,7 +141,7 @@ void Board::move(std::string fromto, bool print_board)
     else if(fromto=="e8g8"){ // Short castling for black
         // Change the piece
         this->squares[9][9].set_piece(' ');
-        this->squares[9][7].set_piece('R');
+        this->squares[9][7].set_piece('r');
         // Modify the allowed castles
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
@@ -149,7 +149,7 @@ void Board::move(std::string fromto, bool print_board)
     else if(fromto=="e8c8"){ // Long castling for black
         // Change the piece
         this->squares[9][2].set_piece(' ');
-        this->squares[9][5].set_piece('R');
+        this->squares[9][5].set_piece('r');
         // Modify the allowed castles
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
