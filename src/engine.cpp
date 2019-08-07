@@ -228,7 +228,6 @@ std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves
 
       // Append it if there is no check_move
       if(check_moves.size()==0){
-        std::string move_sure=moves[i];
         moves_definitive.push_back(moves[i]);
       }
       
@@ -344,7 +343,7 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
     }
     // One square diagonal (capture) --> king capture should never happen unless checkmate
     if((this->board.get_piece(i-1, j+1)=='P' || this->board.get_piece(i-1, j+1)=='R' || this->board.get_piece(i-1, j+1)=='N' || this->board.get_piece(i-1, j+1)=='B' || this->board.get_piece(i-1, j+1)=='Q' || this->board.get_piece(i-1, j+1)=='K') && this->board.is_valid(i-1, j+1)){
-      std::string target_sq=this->notate_square(i+1,j+1);
+      std::string target_sq=this->notate_square(i-1,j+1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
     }
@@ -355,7 +354,7 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
       moves_pawn.push_back(move);
     }
     // One square diagonal (capture) --> king capture should never happen unless checkmate
-    if((this->board.get_piece(i-1, j-1)=='P' || this->board.get_piece(i-1, j-1)=='R' || this->board.get_piece(i-1, j-1)=='N' || this->board.get_piece(i-1, j-1)=='B' || this->board.get_piece(i-1, j-1)=='Q' || this->board.get_piece(i-1, j+1)=='K') && this->board.is_valid(i-1, j-1)){
+    if((this->board.get_piece(i-1, j-1)=='P' || this->board.get_piece(i-1, j-1)=='R' || this->board.get_piece(i-1, j-1)=='N' || this->board.get_piece(i-1, j-1)=='B' || this->board.get_piece(i-1, j-1)=='Q' || this->board.get_piece(i-1, j-1)=='K') && this->board.is_valid(i-1, j-1)){
       std::string target_sq=this->notate_square(i-1,j-1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
