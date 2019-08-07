@@ -295,7 +295,7 @@ std::vector<std::string> Engine::pawn_moves(int i, int j, bool is_white){
       moves_pawn.push_back(move);
     }
     // One square diagonal (capture) --> king capture should never happen unless checkmate
-    if((this->board.get_piece(i+1, j+1)=='p' || this->board.get_piece(i+1, j+1)=='r' || this->board.get_piece(i+1, j+1)=='n' || this->board.get_piece(i+1, j+1)=='b' || this->board.get_piece(i+1, j+1)=='q' || this->board.get_piece(i+1, j-1)=='k') && this->board.is_valid(i+1, j+1)){
+    if((this->board.get_piece(i+1, j+1)=='p' || this->board.get_piece(i+1, j+1)=='r' || this->board.get_piece(i+1, j+1)=='n' || this->board.get_piece(i+1, j+1)=='b' || this->board.get_piece(i+1, j+1)=='q' || this->board.get_piece(i+1, j+1)=='k') && this->board.is_valid(i+1, j+1)){
       std::string target_sq=this->notate_square(i+1,j+1);
       std::string move=orig_sq+target_sq;
       moves_pawn.push_back(move);
