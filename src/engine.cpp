@@ -16,8 +16,8 @@ void Engine::set_board(std::string fen_str){
 }
 
 // Make a move in the board
-void Engine::make_move(std::string move){
-    this->board.move(move);
+void Engine::make_move(std::string move, bool print_board){
+    this->board.move(move, print_board);
 }
 
 // Initialize parameters
@@ -47,7 +47,7 @@ void Engine::compute(){
   }
 
   // See the possible moves
-  std::vector<std::string> legal_moves = this->possible_moves(this->board.get_turn(), this->debugging, check_moves);
+  std::vector<std::string> legal_moves = this->possible_moves(this->board.get_turn(), this->debugging, true);
 
   // Set a random move as the best one
   int randomindex = rand() % legal_moves.size();
@@ -62,7 +62,7 @@ std::vector<std::string> Engine::check_moves(bool white2move){
   std::string target_square=this->find_king(white2move);
 
   // Get all the possible moves from the opponent (black if white turn, white if black turn)
-  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false);
+  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false, false);
 
   // Return the moves with the target square in the legal moves
   return this->moves_in_vector(target_square, legal_moves);
@@ -71,7 +71,7 @@ std::vector<std::string> Engine::check_moves(bool white2move){
 // Moves from black that prevent a castle (aiming at key squares)
 bool Engine::aim_castle(bool white2move, std::vector<std::string> key_squares){
   // Get all the possible moves from the opponent (black if white turn, white if black turn)
-  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false, {}, false);
+  std::vector<std::string> legal_moves = this->possible_moves(!white2move, false, false, {});
 
   // Return the moves with the target square in the legal moves
   for(int i=0; i<key_squares.size(); i++){
@@ -134,7 +134,7 @@ std::vector<std::string> Engine::moves_in_vector(std::string target, std::vector
 }
 
 // Get a list of all possible moves
-std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves, std::vector<std::string> check_moves/*={}*/, bool check_castling/*=true*/){
+std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves, bool review_checks, bool check_castling/*=true*/){
   // Initialize the vector
   std::vector<std::string> moves={};
   std::vector<std::string> moves_definitive={};
@@ -214,20 +214,21 @@ std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves
   }
 
   // From all these possible moves, we have to delete the ones not helping to get out of a check if there is any
-  // If we have no possible escape, it is checkmate
-  if(check_moves.size()>0){
+  // If we have no possible escape (no possible moves), it is checkmate
+  if(review_checks){
     // Get original board so that we do not loss it
     bool white2move=this->board.get_turn();
     Board board_original=this->board;
 
     // Loop all the possible moves
     for(int i=0; i<moves.size(); i++){
-      // See if it gets out of all checks by making the move
-      this->make_move(moves[i]);
-      std::vector<std::string> check_moves2 = this->check_moves(white2move);
+      // See if it gets out of all checks (or does not enter to) by making the move
+      this->make_move(moves[i], false);
+      std::vector<std::string> check_moves = this->check_moves(white2move);
 
       // Append it if there is no check_move
-      if(check_moves2.size()==0){
+      if(check_moves.size()==0){
+        std::string move_sure=moves[i];
         moves_definitive.push_back(moves[i]);
       }
       

@@ -50,7 +50,7 @@ void UCI::get_position(std::stringstream& var_stream){
 
   // Make the moves (if any)
   while(var_stream >> arg_next)
-    this->engine.make_move(arg_next);
+    this->engine.make_move(arg_next, true);
 }
 
 // Get go commands

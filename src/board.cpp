@@ -97,7 +97,7 @@ bool Board::is_enpassant(int i, int j){
 
 // Move
 // This function assumes that the move is legal. It is not the responsibility of this function to check if it is legal
-void Board::move(std::string fromto)
+void Board::move(std::string fromto, bool print_board)
 {
     // It is always four characters
     char from[2];
@@ -223,7 +223,7 @@ void Board::move(std::string fromto)
         this->halfmoves = 0;
 
     // Print the board if debugging
-    if (this->debugging)
+    if (print_board)
         this->print_board();
 }
 

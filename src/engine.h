@@ -17,9 +17,9 @@ class Engine{
 public:
     Engine(); // Constructor
     void set_board(std::string fen_str); // Set a board
-    void make_move(std::string move); // Make a move to the board
+    void make_move(std::string move, bool print_board); // Make a move to the board
     std::vector<std::string> check_moves(bool white2move); // Get a list of all check moves against you
-    std::vector<std::string> possible_moves(bool white2move, bool show_moves, std::vector<std::string> check_moves={}, bool check_castling=true); // Get a list of all possible moves
+    std::vector<std::string> possible_moves(bool white2move, bool show_moves, bool review_checks, bool check_castling=true); // Get a list of all possible moves
     void compute(); // Compute the best move
 
     // Public parameters

@@ -41,7 +41,7 @@ public:
     Board(std::string fen_string);
     Board(); // Default one
     // Move
-    void move(std::string fromto);
+    void move(std::string fromto, bool print_board);
     // Getters
     int get_size(){return sizeof(this->squares) / sizeof(*this->squares);}; // Size
     bool get_turn(){return this->white_moves;}; // White to move?
