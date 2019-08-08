@@ -8,6 +8,7 @@
 // Default constructor
 Engine::Engine(){
   this->debugging=false;
+  this->use_alphabeta=true;
 };
 
 // Set a board
@@ -79,8 +80,15 @@ void Engine::compute(){
     this->nodes_searched=0; // Initialize the nodes at 0
     std::clock_t begin = clock();
 
-    // Call the minimax function
-    double best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval);
+    // Call the alphabeta/minimax function
+    double best_score;
+    if(this->use_alphabeta){
+      double alpha=-100000;
+      double beta=100000;
+      best_score=this->alphabeta(this->searched_tree, curr_depth, alpha, beta, this->board.get_turn(), eval);
+    }
+    else
+      best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval);
     this->bestmove = this->searched_tree.move; // The outer most
 
     // End counting time
@@ -129,7 +137,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       if(value_int>value){
         node.move=legal_moves[i];
         node.score=value_int;
-        this->bestline[this->bestline.size()-depth]=legal_moves[i];
+        this->bestline[this->bestline.size()-depth]=legal_moves[i]; // Wrong best line at second level!!!!
       }
       value=value_int;
       
@@ -158,6 +166,84 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       if(value_int<value){
         node.move=legal_moves[i];
         node.score=value_int;
+        this->bestline[this->bestline.size()-depth]=legal_moves[i]; // Wrong best line at second level!!!!
+      }
+      value=value_int;
+
+      // Save the node
+      this->searched_tree.children.push_back(child);
+    
+      // Get back to the original board
+      this->nodes_searched++;
+      this->board=board_original;
+    }
+    return value;
+  }
+}
+
+// Alphabeta function
+double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool maximizingPlayer, Evaluation eval){
+  // If end of depth or terminal node
+  if(depth==0)
+    return node.score;
+  
+  // Get all possible moves
+  std::vector<std::string> legal_moves = this->possible_moves(maximizingPlayer, this->debugging, true);
+
+  // Get original board so that we do not loss it
+  Board board_original=this->board;
+
+  // Maximize
+  if(maximizingPlayer){
+    double value=-100000;
+    for(size_t i=0; i<legal_moves.size(); i++){
+      // Make the move
+      this->make_move(legal_moves[i], false);
+      
+      // Evaluate the position
+      Node child;
+      child.move=legal_moves[i];
+      child.score=eval.eval_pos(this->board);
+
+      // Compute the maximum
+      double value_int=std::max(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval));
+      if(value_int>value){
+        node.move=legal_moves[i];
+        node.score=value_int;
+        this->bestline[this->bestline.size()-depth]=legal_moves[i];
+      }
+      value=value_int;
+      
+      // Save the node
+      this->searched_tree.children.push_back(child);
+    
+      // Get back to the original board
+      this->nodes_searched++;
+      this->board=board_original;
+
+      // Beta cut-off
+      alpha = std::max(alpha, value_int);
+      if(alpha>=beta)
+        break;
+    }
+    return value;
+  }
+  else { // Minimize
+    double value=100000;
+    for(size_t i=0; i<legal_moves.size(); i++){
+      // Make the move
+      this->make_move(legal_moves[i], false);
+      
+      // Evaluate the position
+      Node child;
+      child.move=legal_moves[i];
+      child.score=eval.eval_pos(this->board);
+
+      // Compute the maximum
+      double value_int=std::min(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval));
+      if(value_int<value){
+        node.move=legal_moves[i];
+        node.score=value_int;
         this->bestline[this->bestline.size()-depth]=legal_moves[i];
       }
       value=value_int;
@@ -168,6 +254,11 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       // Get back to the original board
       this->nodes_searched++;
       this->board=board_original;
+
+      // Alpha cut-off
+      beta = std::min(beta, value_int);
+      if(alpha>=beta)
+        break;
     }
     return value;
   }

@@ -76,6 +76,7 @@ private:
 
     // Minimax function
     double minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval);
+    double alphabeta(Node &node, int depth, double alpha, double beta, bool maximizingPlayer, Evaluation eval);
 
     // Display info
     void display_depth(int depth); // Display only the depth
@@ -86,6 +87,7 @@ private:
     // Parameters
     Board board;
     bool debugging; // For debugging purposes
+    bool use_alphabeta;
 
     // Options/Limits
     std::vector<std::string> searchmoves; // Not used yet!!!!!
