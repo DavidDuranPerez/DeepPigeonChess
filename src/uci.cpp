@@ -161,10 +161,6 @@ void UCI::comm_loop(){
 
       // Start computing
       this->engine.compute();
-
-      // Send info commands --> JUST AN EXAMPLE!!
-      std::cout << "info depth 1 seldepth 0" << "\n";
-		  std::cout << "info score cp 13  depth 1 nodes 13 time 15 pv d2d4" << "\n"; 
     }
     else if(command=="stop"){
       // Stop searching

@@ -7,6 +7,8 @@
 
 // 3rd libraries
 #include <vector>
+#include <algorithm>
+#include <ctime>
 
 // Own libraries
 #include "board.h"
@@ -14,10 +16,10 @@
 
 // Structure representing a node (every time you make a possible move and evaluate it)
 struct Node{
-  std::string move="";
-  double score=0.0;
+  std::string move=""; // String representing the move
+  double score=0.0; // Score
   int depth=1; // Number of halfmoves
-  std::string previous_moves=""; // A string representing the parents of this node (if any)
+  std::vector<Node> children={}; // Children
 };
 
 
@@ -72,6 +74,15 @@ private:
     std::string find_king(bool white2move); // Find the square of the king
     bool aim_castle(bool white2move, std::vector<std::string> key_squares); // Moves from black that prevent a castle (aiming at key squares)
 
+    // Minimax function
+    double minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval);
+
+    // Display info
+    void display_depth(int depth); // Display only the depth
+    void display_score(int score, int depth, int nodes, int time, std::string best_line); // Display the score
+    void display_nps(int nps); // Display the nodes per second 
+    std::string get_best_line(int depth); // Get best line
+
     // Parameters
     Board board;
     bool debugging; // For debugging purposes
@@ -91,9 +102,11 @@ private:
     bool infinite=false; // Search until the "stop" command. Not used yet!!!!!!!!
 
     // Results
-    std::vector<Node> searched_nodes; // List of nodes with their score
-    std::string bestmove;
+    Node searched_tree; // List of nodes with their score
+    std::string bestmove; // Best immediate move
+    std::vector<std::string> bestline; // Best line
     bool checkmated=false;
+    int nodes_searched=0;
 };
 
 #endif

@@ -7,7 +7,7 @@
 
 // Default constructor
 Engine::Engine(){
-  this->debugging=true;
+  this->debugging=false;
 };
 
 // Set a board
@@ -50,59 +50,162 @@ void Engine::compute(){
   std::vector<std::string> legal_moves = this->possible_moves(this->board.get_turn(), this->debugging, true);
 
   // Initialize the nodes
-  this->searched_nodes={};
+  Node node;
+  this->searched_tree=node;
 
-  // Evaluate each node at the given depth
+  // Decide the depth
+  int depth_max=this->depth;
+  if(depth_max==0)
+    depth_max=3;
+
+  // Create the evaluation function
   Evaluation eval=Evaluation();
+
   // Get original board so that we do not loss it
   Board board_original=this->board;
-  for(size_t i=0; i<legal_moves.size(); i++){
-    // Make the move
-    this->make_move(legal_moves[i], false);
 
-    // Evaluate the position
-    Node node;
-    node.move=legal_moves[i];
-    node.score=eval.eval_pos(this->board);
+  // Start first with small depths and increase it. This repeats unnecessary loops though they are the faster ones!!!!!!
+  int curr_depth=1;
+  while(curr_depth<=depth_max){
+    // Display info
+    this->display_depth(curr_depth);
 
-    // Save the node
-    this->searched_nodes.push_back(node);
-    
-    // Get back to the original board
-    this->board=board_original;
+    // Create the element in the vector of bestline if it does not exist
+    this->bestline={};
+    while(this->bestline.size()<curr_depth)
+      this->bestline.push_back(" ");
+
+    // Begin counting time for that line
+    this->nodes_searched=0; // Initialize the nodes at 0
+    std::clock_t begin = clock();
+
+    // Call the minimax function
+    double best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval);
+    this->bestmove = this->searched_tree.move; // The outer most
+
+    // End counting time
+    std::clock_t end = clock();
+    double elapsed_ms = double(end - begin);
+
+    // Display info
+    this->display_score((int)best_score, curr_depth, this->nodes_searched, elapsed_ms, this->get_best_line(curr_depth));
+    this->display_nps((int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms));
+
+    // Increase the depth
+    curr_depth++;
   }
-
-  // Search for the node with more score
-  bool white2move=this->board.get_turn();
-  double max_score;
-  if(white2move)
-    max_score=-100000;
-  else
-    max_score=100000;
-  int max_ind=0;
-  for(size_t i=0; i<this->searched_nodes.size(); i++){
-    // For white search the maximum
-    if(white2move){
-      if(this->searched_nodes[i].score>max_score){
-        max_score=this->searched_nodes[i].score;
-        max_ind=i;
-      }
-    }
-    else{ // For black we have to search the minimum
-      if(this->searched_nodes[i].score<max_score){
-        max_score=this->searched_nodes[i].score;
-        max_ind=i;
-      }
-    }
-  }
-  this->bestmove = this->searched_nodes[max_ind].move;
-
-  // Random move
-  //int randomindex = rand() % this->searched_nodes.size();
-  //this->bestmove = this->searched_nodes[randomindex].move;
 
   // Get best move
   this->get_bestmove();
+
+}
+
+// Minimax function
+double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval){
+  // If end of depth or terminal node
+  if(depth==0)
+    return node.score;
+  
+  // Get all possible moves
+  std::vector<std::string> legal_moves = this->possible_moves(maximizingPlayer, this->debugging, true);
+
+  // Get original board so that we do not loss it
+  Board board_original=this->board;
+
+  // Maximize
+  if(maximizingPlayer){
+    double value=-100000;
+    for(size_t i=0; i<legal_moves.size(); i++){
+      // Make the move
+      this->make_move(legal_moves[i], false);
+      
+      // Evaluate the position
+      Node child;
+      child.move=legal_moves[i];
+      child.score=eval.eval_pos(this->board);
+
+      // Compute the maximum
+      double value_int=std::max(value, this->minimax(child, depth-1, !maximizingPlayer, eval));
+      if(value_int>value){
+        node.move=legal_moves[i];
+        node.score=value_int;
+        this->bestline[this->bestline.size()-depth]=legal_moves[i];
+      }
+      value=value_int;
+      
+      // Save the node
+      this->searched_tree.children.push_back(child);
+    
+      // Get back to the original board
+      this->nodes_searched++;
+      this->board=board_original;
+    }
+    return value;
+  }
+  else { // Minimize
+    double value=100000;
+    for(size_t i=0; i<legal_moves.size(); i++){
+      // Make the move
+      this->make_move(legal_moves[i], false);
+      
+      // Evaluate the position
+      Node child;
+      child.move=legal_moves[i];
+      child.score=eval.eval_pos(this->board);
+
+      // Compute the maximum
+      double value_int=std::min(value, this->minimax(child, depth-1, !maximizingPlayer, eval));
+      if(value_int<value){
+        node.move=legal_moves[i];
+        node.score=value_int;
+        this->bestline[this->bestline.size()-depth]=legal_moves[i];
+      }
+      value=value_int;
+
+      // Save the node
+      this->searched_tree.children.push_back(child);
+    
+      // Get back to the original board
+      this->nodes_searched++;
+      this->board=board_original;
+    }
+    return value;
+  }
+}
+
+// Get best line
+std::string Engine::get_best_line(int depth){
+  std::string best_line=this->bestline[0];
+  for(size_t i=1; i<this->bestline.size(); i++){
+    best_line+=" "+this->bestline[i];
+  }
+  return best_line;
+}
+
+// Display info
+void Engine::display_depth(int depth){
+  std::stringstream ss;
+  ss << depth;
+  std::cout << "info depth " << ss.str() << "\n";
+}
+void Engine::display_score(int score, int depth, int nodes, int time, std::string best_line){
+  std::stringstream ss;
+  ss << score;
+  std::cout << "info score cp " << ss.str();
+  std::stringstream ss2;
+  ss2 << depth;
+  std::cout << " depth " << ss2.str();
+  std::stringstream ss3;
+  ss3 << nodes;
+  std::cout << " nodes " << ss3.str();
+  std::stringstream ss4;
+  ss4 << time;
+  std::cout << " time " << ss4.str() << " pv " << best_line << "\n";
+}
+void Engine::display_nps(int nps){
+  std::stringstream ss;
+  ss << nps;
+  std::cout << "info nps " << ss.str() << "\n"; 
 }
 
 std::vector<std::string> Engine::check_moves(bool white2move){
