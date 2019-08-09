@@ -30,11 +30,20 @@ double Evaluation::eval_pos(Board board){
     // Variable to store the result
     double result=0.0;
 
-    // 1. Count pieces
-    result+=this->count_pieces();
+    // First, see if it is checkmate
+    if(this->board.is_checkmated()){
+        if(this->board.get_turn())
+            return NEG_INF; // White is checkmated
+        else
+            return POS_INF; // Black is checkmated
+    }
+    else{
+        // 1. Count pieces
+        result+=this->count_pieces();
 
-    // Return the result
-    return result;
+        // Return the result
+        return result;
+    }
 }
 
 // Count just the pieces

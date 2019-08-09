@@ -83,8 +83,8 @@ void Engine::compute(){
     // Call the alphabeta/minimax function
     double best_score;
     if(this->use_alphabeta){
-      double alpha=-100000;
-      double beta=100000;
+      double alpha=2*NEG_INF;
+      double beta=2*POS_INF;
       best_score=this->alphabeta(this->searched_tree, curr_depth, alpha, beta, this->board.get_turn(), eval);
     }
     else
@@ -110,19 +110,23 @@ void Engine::compute(){
 
 // Minimax function
 double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval){
-  // If end of depth or terminal node
+  // If end of depth
   if(depth==0)
     return node.score;
-  
-  // Get all possible moves
-  std::vector<std::string> legal_moves = this->possible_moves(maximizingPlayer, this->debugging, true);
 
   // Get original board so that we do not loss it
   Board board_original=this->board;
 
+  // Get all possible moves
+  std::vector<std::string> legal_moves = this->possible_moves(maximizingPlayer, this->debugging, true);
+
+  // See if it is checkmate (terminal node)
+  if(this->board.is_checkmated()) // If checkmate, we still haven't evaluate it
+      return eval.eval_pos(this->board); // No need to make a move for the evaluation function since it is in checkmate
+
   // Maximize
   if(maximizingPlayer){
-    double value=-100000;
+    double value=2*NEG_INF;
     for(size_t i=0; i<legal_moves.size(); i++){
       // Make the move
       this->make_move(legal_moves[i], false);
@@ -151,7 +155,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
     return value;
   }
   else { // Minimize
-    double value=100000;
+    double value=2*POS_INF;
     for(size_t i=0; i<legal_moves.size(); i++){
       // Make the move
       this->make_move(legal_moves[i], false);
@@ -183,20 +187,28 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
 
 // Alphabeta function
 double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool maximizingPlayer, Evaluation eval){
-  // If end of depth or terminal node
+  // If end of depth
   if(depth==0)
     return node.score;
-  
-  // Get all possible moves
-  std::vector<std::string> legal_moves = this->possible_moves(maximizingPlayer, this->debugging, true);
 
   // Get original board so that we do not loss it
   Board board_original=this->board;
 
+  // Get all possible moves
+  std::vector<std::string> legal_moves = this->possible_moves(maximizingPlayer, this->debugging, true);
+
+  // See if it is checkmate (terminal node)
+  if(this->board.is_checkmated()) // If checkmate, we still haven't evaluate it
+      return eval.eval_pos(this->board); // No need to make a move for the evaluation function since it is in checkmate
+
   // Maximize
   if(maximizingPlayer){
-    double value=-100000;
+    double value=2*NEG_INF;
+    bool tochange=false;
     for(size_t i=0; i<legal_moves.size(); i++){
+      // Initialize it
+      tochange=false;
+
       // Make the move
       this->make_move(legal_moves[i], false);
       
@@ -210,7 +222,7 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       if(value_int>value){
         node.move=legal_moves[i];
         node.score=value_int;
-        this->bestline[this->bestline.size()-depth]=legal_moves[i];
+        tochange=true;
       }
       value=value_int;
       
@@ -225,12 +237,20 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       alpha = std::max(alpha, value_int);
       if(alpha>=beta)
         break;
+      else{
+        if(tochange)
+          this->bestline[this->bestline.size()-depth]=legal_moves[i];
+      }
     }
     return value;
   }
   else { // Minimize
-    double value=100000;
+    double value=2*POS_INF;
+    bool tochange=false;
     for(size_t i=0; i<legal_moves.size(); i++){
+      // Initialize it
+      tochange=false;
+
       // Make the move
       this->make_move(legal_moves[i], false);
       
@@ -244,7 +264,7 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       if(value_int<value){
         node.move=legal_moves[i];
         node.score=value_int;
-        this->bestline[this->bestline.size()-depth]=legal_moves[i];
+        tochange=true;
       }
       value=value_int;
 
@@ -259,6 +279,10 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       beta = std::min(beta, value_int);
       if(alpha>=beta)
         break;
+      else{
+        if(tochange)
+          this->bestline[this->bestline.size()-depth]=legal_moves[i];
+      }
     }
     return value;
   }
@@ -483,7 +507,7 @@ std::vector<std::string> Engine::possible_moves(bool white2move, bool show_moves
 
   // We are in checkmate
   if(moves_definitive.size()==0){
-    this->checkmated=true;
+    this->board.set_checkmate(true);
   }
 
   if(show_moves){

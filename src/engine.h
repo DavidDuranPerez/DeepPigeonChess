@@ -107,7 +107,6 @@ private:
     Node searched_tree; // List of nodes with their score
     std::string bestmove; // Best immediate move
     std::vector<std::string> bestline; // Best line
-    bool checkmated=false;
     int nodes_searched=0;
 };
 

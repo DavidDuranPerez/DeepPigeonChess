@@ -8,6 +8,10 @@
 // Own libraries
 #include "board.h"
 
+// Constants
+const double POS_INF=100000;
+const double NEG_INF=-100000;
+
 // Class for the evaluation
 class Evaluation{
 public:

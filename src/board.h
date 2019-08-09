@@ -51,6 +51,10 @@ public:
     bool is_valid(int i, int j){return this->squares[i][j].get_valid();}; // See if a square is valid
     bool is_castle_allowed(char type_castle); // See if a type of castle is allowed
     bool is_enpassant(int i, int j); // Check if a square is a target en-passant square
+    bool is_checkmated(){return this->checkmated;};
+
+    // Setter
+    void set_checkmate(bool checkmated){this->checkmated=checkmated;}; // Set a checkmate
 
     // Print board
     void print_board();
@@ -64,6 +68,7 @@ private:
     std::string en_passant_target; // En passant target square in algebraic notation (regardless of whether there is a pawn in position to make the capture)
     int halfmoves; // Number of halfmoves since last capture of pawn move
     int fullmoves; // Number of fullmoves (starting at 1 and increased after black move)
+    bool checkmated=false; // To indicate that it is checkmated
 
     // Convert FEN to position
     void fen2pos(std::string fen_str);
