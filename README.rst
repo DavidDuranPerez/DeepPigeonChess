@@ -16,12 +16,26 @@ Copyright (C) 2019, David Duran
 Build Instructions
 -------------------
 
-To create an executable of the chess engine::
+To easily create an executable of the chess engine::
 
 	cd src
 	g++ -g main.cpp uci.cpp board.cpp engine.cpp evaluation.cpp -std=c++11 -o ../dist/DeepPigeon.exe
 
 You can then run the program.
+
+Continuous Integration
+-----------------------
+
+This project follows CI for both Linux (Travis) and Windows (AppVeyor), following the C++11 standard:
+
++----------+-----------------------------------+
+| CI       |     Systems/Compilers             |
++==========+===================================+
+| Travis   | Linux (gcc5)                      |
++----------+-----------------------------------+
+| AppVeyor | Windows x64 (Visual Studio 2017)  |
++----------+-----------------------------------+
+
 
 UCI implemented commands
 -------------------------
