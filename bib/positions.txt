@@ -1,0 +1,4 @@
+Testing positions:
+
+position startpos moves d2d4 d7d5 c2c4 d5c4 e2e3 b7b5 a2a4 c7c6 a4b5 c6b5 d1f3 c8b7 --> QGA trick
+position startpos moves e2e3 f7f5 f1c4 g7g5 --> checkmate in 1

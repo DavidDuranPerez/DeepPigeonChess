@@ -26,7 +26,7 @@ You can then run the program.
 Continuous Integration
 -----------------------
 
-This project follows CI for both Linux (Travis) and Windows (AppVeyor), following the C++11 standard:
+This project follows CI for both Linux (Travis) and Windows (AppVeyor), according to the C++11 standard:
 
 +----------+-----------------------------------+
 | CI       |     Systems/Compilers             |
