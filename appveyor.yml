@@ -13,6 +13,7 @@ install:
     - git submodule update --init --recursive
 
 before_build:
+    - cd src
     - cmake -G "Visual Studio 15 2017 Win64" .
 
 build:
