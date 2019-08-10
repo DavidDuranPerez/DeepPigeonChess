@@ -88,7 +88,7 @@ void Engine::compute(){
       best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval, mover);
     
     // Get best move and best line
-    this->bestmove = this->searched_tree.move; // The outer most
+    this->bestmove = this->searched_tree.bestmove; // The outer most
     this->bestline=this->get_pv(curr_depth);
 
     // End counting time
