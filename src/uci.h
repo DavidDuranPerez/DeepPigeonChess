@@ -30,6 +30,7 @@ private:
   // Parameters
   Engine engine=Engine();
   std::time_t initial_time;
+  bool debugging;
 };
 
 #endif

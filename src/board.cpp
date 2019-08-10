@@ -49,14 +49,14 @@ void Square::set_piece(char piece)
 
 // Default constructor
 Board::Board(){
-    this->debugging = true;
+    this->debugging = false;
 }
 
 // Constructor for the board --> default initial position
 Board::Board(std::string fen_string)
 {
     // Debugging
-    this->debugging = true;
+    this->debugging = false;
 
     // Starting position
     this->fen2pos(fen_string);

@@ -13,6 +13,7 @@
 // Own libraries
 #include "board.h"
 #include "evaluation.h"
+#include "mover.h"
 
 // Structure representing a node (every time you make a possible move and evaluate it)
 struct Node{
@@ -26,11 +27,10 @@ struct Node{
 // Class for the engine
 class Engine{
 public:
+    // Main functions
     Engine(); // Constructor
     void set_board(std::string fen_str); // Set a board
     void make_move(std::string move, bool print_board); // Make a move to the board
-    std::vector<std::string> check_moves(bool white2move); // Get a list of all check moves against you
-    std::vector<std::string> possible_moves(bool white2move, bool show_moves, bool review_checks, bool check_castling=true); // Get a list of all possible moves
     void compute(); // Compute the best move
 
     // Public parameters
@@ -60,23 +60,9 @@ public:
     void get_bestmove(){std::cout << "bestmove " << this->bestmove << "\n";};
 
 private:
-    // Functions
-    bool is_in_array(char ch, char (&arr)[6]); // Is the character in the array
-    std::vector<std::string> moves_in_vector(std::string target, std::vector<std::string> v); // Moves that contain the target
-    std::vector<std::string> pawn_moves(int i, int j, bool is_white); // Pawn moves from the position i,j
-    std::string basic_move_capture(int i_target, int j_target, bool is_white); // It tells which kind of move it is (normal, capture, block, invalid...)
-    std::vector<std::string> rook_moves(int i, int j, bool is_white); // Rook moves from the position i,j
-    std::vector<std::string> knight_moves(int i, int j, bool is_white); // Knight moves from the position i,j
-    std::vector<std::string> bishop_moves(int i, int j, bool is_white); // Bishop moves from the position i,j
-    std::vector<std::string> queen_moves(int i, int j, bool is_white); // Queen moves from the position i,j
-    std::vector<std::string> king_moves(int i, int j, bool is_white, bool check_castling=true); // King moves from the position i,j
-    std::string notate_square(int i, int j); // Notate a square
-    std::string find_king(bool white2move); // Find the square of the king
-    bool aim_castle(bool white2move, std::vector<std::string> key_squares); // Moves from black that prevent a castle (aiming at key squares)
-
     // Minimax function
-    double minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval);
-    double alphabeta(Node &node, int depth, double alpha, double beta, bool maximizingPlayer, Evaluation eval);
+    double minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover);
+    double alphabeta(Node &node, int depth, double alpha, double beta, bool maximizingPlayer, Evaluation eval, Mover mover);
 
     // Display info
     void display_depth(int depth); // Display only the depth

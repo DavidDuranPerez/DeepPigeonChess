@@ -19,7 +19,7 @@ Build Instructions
 To easily create an executable of the chess engine::
 
 	cd src
-	g++ -g main.cpp uci.cpp board.cpp engine.cpp evaluation.cpp -std=c++11 -o ../dist/DeepPigeon.exe
+	g++ -g main.cpp uci.cpp board.cpp engine.cpp mover.cpp evaluation.cpp -std=c++11 -o ../dist/DeepPigeon.exe
 
 You can then run the program.
 

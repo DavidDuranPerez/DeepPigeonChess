@@ -15,7 +15,7 @@ install:
 
 script:
 - cd src
-- g++ -g main.cpp uci.cpp board.cpp engine.cpp evaluation.cpp -std=c++11 -o DeepPigeon
+- g++ -g main.cpp uci.cpp board.cpp engine.cpp mover.cpp evaluation.cpp -std=c++11 -o DeepPigeon
 
 branches:
   only:

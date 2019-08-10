@@ -7,12 +7,12 @@
 
 // Constructor
 UCI::UCI(){
-  // Initialize the engine
-  //this->engine = Engine();
+  // Debugging or not
+  this->debugging=false;
 
   // Set the initial time
-  this->initial_time = time(0);
-  std::cout << this->initial_time << "\n";
+  // this->initial_time = time(0);
+  // std::cout << this->initial_time << "\n";
 }
 
 // Get the information of the engine
@@ -50,7 +50,7 @@ void UCI::get_position(std::stringstream& var_stream){
 
   // Make the moves (if any)
   while(var_stream >> arg_next)
-    this->engine.make_move(arg_next, true);
+    this->engine.make_move(arg_next, this->debugging);
 }
 
 // Get go commands
