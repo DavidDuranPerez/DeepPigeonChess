@@ -15,9 +15,14 @@
 #include "evaluation.h"
 #include "mover.h"
 
-// Structure representing a node (every time you make a possible move and evaluate it)
-struct Node{
+// Class representing a node (every time you make a possible move and evaluate it)
+class Node{
+public:
+  Node(); // Default constructor
+
+  // Main attributes
   std::string move=""; // String representing the move
+  std::string bestmove=""; // String representing the best move of the children
   double score=0.0; // Score
   int depth=1; // Number of halfmoves
   std::vector<Node> children={}; // Children
@@ -68,7 +73,7 @@ private:
     void display_depth(int depth); // Display only the depth
     void display_score(int score, int depth, int nodes, int time, std::string best_line); // Display the score
     void display_nps(int nps); // Display the nodes per second 
-    std::string get_best_line(int depth); // Get best line
+    std::string get_pv(int depth); // Get the best line
 
     // Parameters
     Board board;
@@ -92,7 +97,7 @@ private:
     // Results
     Node searched_tree; // List of nodes with their score
     std::string bestmove; // Best immediate move
-    std::vector<std::string> bestline; // Best line
+    std::string bestline; // Best line
     int nodes_searched=0;
 };
 

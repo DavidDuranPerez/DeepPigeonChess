@@ -5,7 +5,16 @@
 
 #include "engine.h"
 
-// Default constructor
+// Default constructor for node
+Node::Node(){
+  this->move=""; // String representing the move
+  this->bestmove=""; // String representing the best move of the children
+  this->score=0.0; // Score
+  this->depth=1; // Number of halfmoves
+  this->children={}; // Children
+}
+
+// Default constructor for engine
 Engine::Engine(){
   this->debugging=false;
   this->use_alphabeta=true;
@@ -46,10 +55,6 @@ void Engine::compute(){
   // See the possible moves
   std::vector<std::string> legal_moves = mover.possible_moves(this->board, this->board.get_turn(), this->debugging, true);
 
-  // Initialize the nodes
-  Node node;
-  this->searched_tree=node;
-
   // Decide the depth
   int depth_max=this->depth;
   if(depth_max==0)
@@ -61,13 +66,12 @@ void Engine::compute(){
   // Start first with small depths and increase it. This repeats unnecessary loops though they are the faster ones!!!!!!
   int curr_depth=1;
   while(curr_depth<=depth_max){
+    // Initialize the nodes
+    Node node=Node();
+    this->searched_tree=node;
+
     // Display info
     this->display_depth(curr_depth);
-
-    // Create the element in the vector of bestline if it does not exist
-    this->bestline={};
-    while(this->bestline.size()<curr_depth)
-      this->bestline.push_back(" ");
 
     // Begin counting time for that line
     this->nodes_searched=0; // Initialize the nodes at 0
@@ -82,14 +86,17 @@ void Engine::compute(){
     }
     else
       best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval, mover);
+    
+    // Get best move and best line
     this->bestmove = this->searched_tree.move; // The outer most
+    this->bestline=this->get_pv(curr_depth);
 
     // End counting time
     std::clock_t end = clock();
     double elapsed_ms = double(end - begin);
 
     // Display info
-    this->display_score((int)best_score, curr_depth, this->nodes_searched, elapsed_ms, this->get_best_line(curr_depth));
+    this->display_score((int)best_score, curr_depth, this->nodes_searched, elapsed_ms, this->bestline);
     this->display_nps((int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms));
 
     // Increase the depth
@@ -120,30 +127,23 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
   // Maximize
   if(maximizingPlayer){
     double value=2*NEG_INF;
-    bool tochange=false;
     for(size_t i=0; i<legal_moves.size(); i++){
-      // Initialize it
-      tochange=false;
-
       // Make the move
       this->make_move(legal_moves[i], false);
       
       // Evaluate the position
-      Node child;
+      Node child=Node();
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
       // Compute the maximum
       double value_int=std::max(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
       if(value_int>value){
-        node.move=legal_moves[i];
+        node.bestmove=legal_moves[i];
         node.score=value_int;
-        tochange=true;
       }
+      node.children.push_back(child); // Append the child to the parent
       value=value_int;
-      
-      // Save the node
-      this->searched_tree.children.push_back(child);
     
       // Get back to the original board
       this->nodes_searched++;
@@ -153,39 +153,28 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       alpha = std::max(alpha, value_int);
       if(alpha>=beta)
         break;
-      else{
-        if(tochange)
-          this->bestline[this->bestline.size()-depth]=legal_moves[i];
-      }
     }
     return value;
   }
   else { // Minimize
     double value=2*POS_INF;
-    bool tochange=false;
     for(size_t i=0; i<legal_moves.size(); i++){
-      // Initialize it
-      tochange=false;
-
       // Make the move
       this->make_move(legal_moves[i], false);
       
       // Evaluate the position
-      Node child;
+      Node child=Node();
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
       // Compute the maximum
       double value_int=std::min(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
       if(value_int<value){
-        node.move=legal_moves[i];
+        node.bestmove=legal_moves[i];
         node.score=value_int;
-        tochange=true;
       }
+      node.children.push_back(child); // Append the child to the parent
       value=value_int;
-
-      // Save the node
-      this->searched_tree.children.push_back(child);
     
       // Get back to the original board
       this->nodes_searched++;
@@ -195,22 +184,46 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       beta = std::min(beta, value_int);
       if(alpha>=beta)
         break;
-      else{
-        if(tochange)
-          this->bestline[this->bestline.size()-depth]=legal_moves[i];
-      }
     }
     return value;
   }
 }
 
-// Get best line
-std::string Engine::get_best_line(int depth){
-  std::string best_line=this->bestline[0];
-  for(size_t i=1; i<this->bestline.size(); i++){
-    best_line+=" "+this->bestline[i];
+// Get the best lien
+std::string Engine::get_pv(int depth){
+  // The string representing the pv
+  std::string pv="";
+
+  // Node to look into
+  Node node_selected=this->searched_tree;
+
+  // Move to search
+  std::string move2search=node_selected.bestmove;
+  pv = move2search;
+
+  // Define the current depth
+  int curr_depth=depth;
+
+  // Iterate the depths
+  while(depth>0){
+    // Search the move
+    for(size_t i=0; i<node_selected.children.size(); i++)
+    {
+      Node node_int=node_selected.children[i];
+      if(move2search==node_int.move)
+      {
+        node_selected=node_int; // Select the child now
+        if(depth>1){
+          move2search=node_selected.bestmove; // New move to search
+          pv+=" "+move2search;
+        }
+        depth--; // Decrease the depth
+        break;
+      }
+    }
   }
-  return best_line;
+
+  return pv;
 }
 
 // Display info
@@ -263,7 +276,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       this->make_move(legal_moves[i], false);
       
       // Evaluate the position
-      Node child;
+      Node child=Node();
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
@@ -272,12 +285,9 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       if(value_int>value){
         node.move=legal_moves[i];
         node.score=value_int;
-        this->bestline[this->bestline.size()-depth]=legal_moves[i]; // Wrong best line at second level!!!!
       }
       value=value_int;
-      
-      // Save the node
-      this->searched_tree.children.push_back(child);
+      node.children.push_back(child); // Append the child to the parent
     
       // Get back to the original board
       this->nodes_searched++;
@@ -292,7 +302,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       this->make_move(legal_moves[i], false);
       
       // Evaluate the position
-      Node child;
+      Node child=Node();
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
@@ -301,12 +311,9 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       if(value_int<value){
         node.move=legal_moves[i];
         node.score=value_int;
-        this->bestline[this->bestline.size()-depth]=legal_moves[i]; // Wrong best line at second level!!!!
       }
+      node.children.push_back(child); // Append the child to the parent
       value=value_int;
-
-      // Save the node
-      this->searched_tree.children.push_back(child);
     
       // Get back to the original board
       this->nodes_searched++;
