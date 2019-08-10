@@ -23,7 +23,7 @@ public:
   // Main attributes
   std::string move=""; // String representing the move
   std::string bestmove=""; // String representing the best move of the children
-  double score=0.0; // Score
+  int score=0; // Score
   int depth=1; // Number of halfmoves
   std::vector<Node> children={}; // Children
 };
@@ -66,8 +66,8 @@ public:
 
 private:
     // Minimax function
-    double minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover);
-    double alphabeta(Node &node, int depth, double alpha, double beta, bool maximizingPlayer, Evaluation eval, Mover mover);
+    int minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover);
+    int alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover);
 
     // Display info
     void display_depth(int depth); // Display only the depth

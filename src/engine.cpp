@@ -78,10 +78,10 @@ void Engine::compute(){
     std::clock_t begin = clock();
 
     // Call the alphabeta/minimax function
-    double best_score;
+    int best_score;
     if(this->use_alphabeta){
-      double alpha=2*NEG_INF;
-      double beta=2*POS_INF;
+      int alpha=2*NEG_INF;
+      int beta=2*POS_INF;
       best_score=this->alphabeta(this->searched_tree, curr_depth, alpha, beta, this->board.get_turn(), eval, mover);
     }
     else
@@ -96,7 +96,7 @@ void Engine::compute(){
     double elapsed_ms = double(end - begin);
 
     // Display info
-    this->display_score((int)best_score, curr_depth, this->nodes_searched, elapsed_ms, this->bestline);
+    this->display_score(best_score, curr_depth, this->nodes_searched, elapsed_ms, this->bestline);
     this->display_nps((int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms));
 
     // Increase the depth
@@ -109,7 +109,7 @@ void Engine::compute(){
 }
 
 // Alphabeta function
-double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool maximizingPlayer, Evaluation eval, Mover mover){
+int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover){
   // If end of depth
   if(depth==0)
     return node.score;
@@ -126,7 +126,7 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
 
   // Maximize
   if(maximizingPlayer){
-    double value=2*NEG_INF;
+    int value=2*NEG_INF;
     for(size_t i=0; i<legal_moves.size(); i++){
       // Make the move
       this->make_move(legal_moves[i], false);
@@ -137,7 +137,7 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       child.score=eval.eval_pos(this->board);
 
       // Compute the maximum
-      double value_int=std::max(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
+      int value_int=std::max(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
       if(value_int>value){
         node.bestmove=legal_moves[i];
         node.score=value_int;
@@ -157,7 +157,7 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
     return value;
   }
   else { // Minimize
-    double value=2*POS_INF;
+    int value=2*POS_INF;
     for(size_t i=0; i<legal_moves.size(); i++){
       // Make the move
       this->make_move(legal_moves[i], false);
@@ -168,7 +168,7 @@ double Engine::alphabeta(Node &node, int depth, double alpha, double beta, bool 
       child.score=eval.eval_pos(this->board);
 
       // Compute the maximum
-      double value_int=std::min(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
+      int value_int=std::min(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
       if(value_int<value){
         node.bestmove=legal_moves[i];
         node.score=value_int;
@@ -255,7 +255,7 @@ void Engine::display_nps(int nps){
 }
 
 // Minimax function
-double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover){
+int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover){
   // If end of depth
   if(depth==0)
     return node.score;
@@ -272,7 +272,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
 
   // Maximize
   if(maximizingPlayer){
-    double value=2*NEG_INF;
+    int value=2*NEG_INF;
     for(size_t i=0; i<legal_moves.size(); i++){
       // Make the move
       this->make_move(legal_moves[i], false);
@@ -283,7 +283,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       child.score=eval.eval_pos(this->board);
 
       // Compute the maximum
-      double value_int=std::max(value, this->minimax(child, depth-1, !maximizingPlayer, eval, mover));
+      int value_int=std::max(value, this->minimax(child, depth-1, !maximizingPlayer, eval, mover));
       if(value_int>value){
         node.move=legal_moves[i];
         node.score=value_int;
@@ -298,7 +298,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
     return value;
   }
   else { // Minimize
-    double value=2*POS_INF;
+    int value=2*POS_INF;
     for(size_t i=0; i<legal_moves.size(); i++){
       // Make the move
       this->make_move(legal_moves[i], false);
@@ -309,7 +309,7 @@ double Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation 
       child.score=eval.eval_pos(this->board);
 
       // Compute the maximum
-      double value_int=std::min(value, this->minimax(child, depth-1, !maximizingPlayer, eval, mover));
+      int value_int=std::min(value, this->minimax(child, depth-1, !maximizingPlayer, eval, mover));
       if(value_int<value){
         node.move=legal_moves[i];
         node.score=value_int;
