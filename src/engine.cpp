@@ -210,12 +210,14 @@ std::string Engine::get_pv(int depth){
     for(size_t i=0; i<node_selected.children.size(); i++)
     {
       Node node_int=node_selected.children[i];
-      if(move2search==node_int.move)
-      {
+      if(move2search==node_int.move){
         node_selected=node_int; // Select the child now
         if(depth>1){
           move2search=node_selected.bestmove; // New move to search
-          pv+=" "+move2search;
+          if(move2search=="") // Due to a checkmate
+            depth=1; // Force ending of the line
+          else
+            pv+=" "+move2search;
         }
         depth--; // Decrease the depth
         break;
