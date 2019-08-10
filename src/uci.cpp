@@ -8,7 +8,7 @@
 // Constructor
 UCI::UCI(){
   // Debugging or not
-  this->debugging=false;
+  this->debugging=true;
 
   // Set the initial time
   // this->initial_time = time(0);

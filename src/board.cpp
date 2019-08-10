@@ -122,7 +122,7 @@ void Board::move(std::string fromto, bool print_board)
     this->squares[row_to][col_to].set_piece(piece_from);
 
     // Castling
-    if(fromto=="e1g1"){ // Short castling for white
+    if(fromto=="e1g1" && piece_from=='K'){ // Short castling for white
         // Change the piece
         this->squares[2][9].set_piece(' ');
         this->squares[2][7].set_piece('R');
@@ -130,7 +130,7 @@ void Board::move(std::string fromto, bool print_board)
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
     }
-    else if(fromto=="e1c1"){ // Long castling for white
+    else if(fromto=="e1c1" && piece_from=='K'){ // Long castling for white
         // Change the piece
         this->squares[2][2].set_piece(' ');
         this->squares[2][5].set_piece('R');
@@ -138,7 +138,7 @@ void Board::move(std::string fromto, bool print_board)
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
     }
-    else if(fromto=="e8g8"){ // Short castling for black
+    else if(fromto=="e8g8" && piece_from=='k'){ // Short castling for black
         // Change the piece
         this->squares[9][9].set_piece(' ');
         this->squares[9][7].set_piece('r');
@@ -146,7 +146,7 @@ void Board::move(std::string fromto, bool print_board)
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
         this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
     }
-    else if(fromto=="e8c8"){ // Long castling for black
+    else if(fromto=="e8c8" && piece_from=='k'){ // Long castling for black
         // Change the piece
         this->squares[9][2].set_piece(' ');
         this->squares[9][5].set_piece('r');
