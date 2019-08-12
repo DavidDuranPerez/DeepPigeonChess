@@ -47,7 +47,8 @@ void Engine::initialize_parameters(){
 }
 
 // Compute the best move
-void Engine::compute(){
+//void Engine::compute(std::future<void> futureObj){
+void Engine::compute(std::atomic<bool> &stop_flag){
   // Create the fundamentals classes
   Mover mover=Mover();
   Evaluation eval=Evaluation();
@@ -57,21 +58,21 @@ void Engine::compute(){
 
   // Decide the depth
   int depth_max=this->depth;
-  if(depth_max==0)
-    depth_max=3;
+  if(this->infinite || depth_max==0)
+    depth_max=1000; // Go infinite
 
   // Get original board so that we do not loss it
   Board board_original=this->board;
 
   // Start first with small depths and increase it. This repeats unnecessary loops though they are the faster ones!!!!!!
   int curr_depth=1;
-  while(curr_depth<=depth_max){
+  while(curr_depth<=depth_max && !stop_flag){ // It can be stopped from outside
     // Initialize the nodes
     Node node=Node();
     this->searched_tree=node;
 
     // Display info
-    this->display_depth(curr_depth);
+    //this->display_depth(curr_depth);
 
     // Begin counting time for that line
     this->nodes_searched=0; // Initialize the nodes at 0
@@ -96,8 +97,10 @@ void Engine::compute(){
     double elapsed_ms = double(end - begin);
 
     // Display info
-    this->display_score(best_score, curr_depth, this->nodes_searched, elapsed_ms, this->bestline);
-    this->display_nps((int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms));
+    if(elapsed_ms<1)
+      elapsed_ms=1;
+    this->display_score(curr_depth, best_score, this->nodes_searched, (int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms), elapsed_ms, this->bestline);
+    //this->display_nps((int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms));
 
     // Increase the depth
     curr_depth++;
@@ -234,19 +237,21 @@ void Engine::display_depth(int depth){
   ss << depth;
   std::cout << "info depth " << ss.str() << "\n";
 }
-void Engine::display_score(int score, int depth, int nodes, int time, std::string best_line){
+void Engine::display_score(int depth, int score, int nodes, int nps, int time, std::string best_line){
+  // Convert to strings
+  std::stringstream ss5;
+  ss5 << depth;
   std::stringstream ss;
   ss << score;
-  std::cout << "info score cp " << ss.str();
-  std::stringstream ss2;
-  ss2 << depth;
-  std::cout << " depth " << ss2.str();
   std::stringstream ss3;
   ss3 << nodes;
-  std::cout << " nodes " << ss3.str();
+  std::stringstream ss6;
+  ss6 << nps;
   std::stringstream ss4;
   ss4 << time;
-  std::cout << " time " << ss4.str() << " pv " << best_line << "\n";
+
+  // Message
+  sync_cout << "info depth " << ss5.str() << " score cp " << ss.str() << " nodes " << ss3.str() << " nps " << ss6.str() << " time " << ss4.str() << " pv " << best_line << sync_endl;
 }
 void Engine::display_nps(int nps){
   std::stringstream ss;

@@ -3,7 +3,9 @@
   Copyright (C) 2019, David Duran
 */
 
+// Own libraries
 #include "uci.h"
+
 
 // Constructor
 UCI::UCI(){
@@ -129,6 +131,10 @@ void UCI::comm_loop(){
   // Engine to GUI: id name, id author, uciok
   std::string command;
   std::string line_command;
+  std::thread calc_thread; // Thread
+  // Create a std::promise object to stop the thread
+	//std::promise<void> exitSignal;
+  std::atomic<bool> stop_flag;
 
   // The communication loop
   do{
@@ -160,10 +166,26 @@ void UCI::comm_loop(){
       this->get_go(var_stream);
 
       // Start computing
-      this->engine.compute();
+      // Since this is a long process, we put it in a thread, which we can stop
+      //Fetch std::future object associated with promise
+	    //std::future<void> futureObj = exitSignal.get_future();
+      stop_flag=false;
+      //this->engine.compute();
+      //calc_thread=std::thread(&Engine::compute, this->engine, std::move(futureObj));
+      calc_thread=std::thread(&Engine::compute, this->engine, std::ref(stop_flag));
+
+      // Thread end
+      calc_thread.join();
     }
-    else if(command=="stop"){
+    else if(command=="stop" || command=="quit"){
       // Stop searching
+      //Set the value in promise
+	    //exitSignal.set_value();
+      stop_flag=true;
+
+      // Wait for the thread to join
+      if(calc_thread.joinable())
+        calc_thread.join();
       
       // Send the best move
       this->engine.get_bestmove();

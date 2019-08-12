@@ -9,6 +9,7 @@
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <thread>
 
 // Own libraries
 #include "engine.h"

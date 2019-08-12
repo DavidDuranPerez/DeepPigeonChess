@@ -18,6 +18,7 @@ int main()
 	uci.engine_info();
 
 	// Communication loop
+	//std::thread comm_loop(&UCI::comm_loop, uci);
 	uci.comm_loop();
 
 	// For debugging

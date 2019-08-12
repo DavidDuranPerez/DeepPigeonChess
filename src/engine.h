@@ -9,11 +9,14 @@
 #include <vector>
 #include <algorithm>
 #include <ctime>
+#include <future>
+#include <chrono>
 
 // Own libraries
 #include "board.h"
 #include "evaluation.h"
 #include "mover.h"
+#include "utilities.h"
 
 // Class representing a node (every time you make a possible move and evaluate it)
 class Node{
@@ -36,7 +39,7 @@ public:
     Engine(); // Constructor
     void set_board(std::string fen_str); // Set a board
     void make_move(std::string move, bool print_board); // Make a move to the board
-    void compute(); // Compute the best move
+    void compute(std::atomic<bool> &stop_flag); // Compute the best move
 
     // Public parameters
     std::string engine_name = "Deep Pigeon";
@@ -71,7 +74,7 @@ private:
 
     // Display info
     void display_depth(int depth); // Display only the depth
-    void display_score(int score, int depth, int nodes, int time, std::string best_line); // Display the score
+    void display_score(int depth, int score, int nodes, int nps, int time, std::string best_line); // Display the score
     void display_nps(int nps); // Display the nodes per second 
     std::string get_pv(int depth); // Get the best line
 
@@ -88,11 +91,11 @@ private:
     double winc=-1.0; // White increment per move (msec). Not used yet!!!!!!
     double binc=-1.0; // Black increment per move (msec). Not used yet!!!!!!
     int movestogo=0; // Moves to go to the next time control. If you only receive wtime, there is no other time control. Not used yet!!!!!!!
-    int depth=0; // Search x plies (halfmoves) only. Not used yet!!!!!!!
+    int depth=0; // Search x plies (halfmoves) only.
     int nodes=0; // Search x nodes only. Not used yet!!!!!!!!!!
     int mate=0; // Search for a mate in x moves. Not used yet!!!!!!!!
     double movetime=-1.0; // Search exactly during x msec. Not used yet!!!!!!!!!
-    bool infinite=false; // Search until the "stop" command. Not used yet!!!!!!!!
+    bool infinite=false; // Search until the "stop" command.
 
     // Results
     Node searched_tree; // List of nodes with their score

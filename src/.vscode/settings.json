@@ -42,6 +42,22 @@
         "vector": "cpp",
         "xmemory": "cpp",
         "xtree": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "atomic": "cpp",
+        "chrono": "cpp",
+        "functional": "cpp",
+        "list": "cpp",
+        "memory": "cpp",
+        "mutex": "cpp",
+        "ratio": "cpp",
+        "xthread": "cpp",
+        "thread": "cpp",
+        "unordered_map": "cpp",
+        "xfunctional": "cpp",
+        "xhash": "cpp",
+        "future": "cpp",
+        "condition_variable": "cpp",
+        "resumable": "cpp",
+        "shared_mutex": "cpp"
     }
 }
