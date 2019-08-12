@@ -68,6 +68,7 @@ void Engine::compute(std::atomic<bool> &stop_flag){
   int curr_depth=1;
   while(curr_depth<=depth_max && !stop_flag){ // It can be stopped from outside
     // Initialize the nodes
+    sync_cout << stop_flag << sync_endl;
     Node node=Node();
     this->searched_tree=node;
 

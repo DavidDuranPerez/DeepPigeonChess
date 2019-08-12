@@ -139,37 +139,37 @@ int Evaluation::piece_square(){
                     result+=king_table[i-2][j-2];
                     break;
                 case 'k': // Black King
-                    result+=king_table[8-(i-2)][8-(j-2)];
+                    result-=king_table[8-(i-2)][8-(j-2)];
                     break;
                 case 'Q': // White Queen
                     result+=queen_table[i-2][j-2];
                     break;
                 case 'q': // Black Queen
-                    result+=queen_table[8-(i-2)][8-(j-2)];
+                    result-=queen_table[8-(i-2)][8-(j-2)];
                     break;
                 case 'R': // White Rook
                     result+=rook_table[i-2][j-2];
                     break;
                 case 'r': // Black Rook
-                    result+=rook_table[8-(i-2)][8-(j-2)];
+                    result-=rook_table[8-(i-2)][8-(j-2)];
                     break;
                 case 'B': // White Bishop
                     result+=bishop_table[i-2][j-2];
                     break;
                 case 'b': // Black Bishop
-                    result+=bishop_table[8-(i-2)][8-(j-2)];
+                    result-=bishop_table[8-(i-2)][8-(j-2)];
                     break;
                 case 'N': // White Knight
                     result+=knight_table[i-2][j-2];
                     break;
                 case 'n': // Black Knight
-                    result+=knight_table[8-(i-2)][8-(j-2)];
+                    result-=knight_table[8-(i-2)][8-(j-2)];
                     break;
                 case 'P': // White pawns
                     result+=pawn_table[i-2][j-2];
                     break;
                 case 'p': // Black pawns
-                    result+=pawn_table[8-(i-2)][8-(j-2)];
+                    result-=pawn_table[8-(i-2)][8-(j-2)];
                     break;
                 default: // No piece
                     break;
