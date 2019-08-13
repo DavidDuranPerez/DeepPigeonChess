@@ -51,7 +51,8 @@ public:
     bool is_valid(int i, int j){return this->squares[i][j].get_valid();}; // See if a square is valid
     bool is_castle_allowed(char type_castle); // See if a type of castle is allowed
     bool is_enpassant(int i, int j); // Check if a square is a target en-passant square
-    bool is_checkmated(){return this->checkmated;};
+    bool is_checkmated(){return this->checkmated;}; // See if checkmated
+    int get_fullmoves(){return this->fullmoves;}; // Get the fullmoves
 
     // Setter
     void set_checkmate(bool checkmated){this->checkmated=checkmated;}; // Set a checkmate

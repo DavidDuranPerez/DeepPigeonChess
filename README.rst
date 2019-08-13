@@ -19,12 +19,12 @@ Build Instructions
 To easily create an executable of the chess engine::
 
 	cd src
-	g++ -g main.cpp uci.cpp board.cpp utilities.cpp engine.cpp mover.cpp evaluation.cpp -std=c++11 -pthread -o ../dist/DeepPigeon.exe
+	g++ -g main.cpp uci.cpp board.cpp utilities.cpp timing.cpp engine.cpp mover.cpp evaluation.cpp -std=c++11 -pthread -o ../dist/DeepPigeon.exe
 
 For a better performance, use O3 optimization (slower to build)::
 
   cd src
-  g++ -g main.cpp uci.cpp board.cpp utilities.cpp engine.cpp mover.cpp evaluation.cpp -std=c++11 -pthread -O3 -o ../dist/DeepPigeon_release.exe
+  g++ -g main.cpp uci.cpp board.cpp utilities.cpp timing.cpp engine.cpp mover.cpp evaluation.cpp -std=c++11 -pthread -O3 -o ../dist/DeepPigeon_release.exe
 
 Continuous Integration
 -----------------------
@@ -59,11 +59,13 @@ This chess engine uses the Universal Chess Interface protocol for communication.
 
     - go infinite
     - go depth [depth_int]
+    - go wtime [time_int] btime [time_int] winc [time_int] binc [time_int] movestogo [moves_int]
   * stop
 
 - Engine to GUI
 
   * id
+
     - id name
     - id author
   * uciok

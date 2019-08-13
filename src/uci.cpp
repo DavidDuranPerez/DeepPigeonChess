@@ -169,6 +169,9 @@ void UCI::comm_loop(){
       this->get_position(var_stream);
     }
     else if(command=="go"){
+      // Start counting the time passed
+      std::clock_t begin = clock();
+
       // Pass several parameters to search
       this->get_go(var_stream);
 
@@ -183,7 +186,7 @@ void UCI::comm_loop(){
       stop_flag=false;
       //this->engine.compute();
       //calc_thread=std::thread(&Engine::compute, this->engine, std::move(futureObj));
-      calc_thread=std::thread(&Engine::compute, this->engine, std::ref(stop_flag));
+      calc_thread=std::thread(&Engine::compute, this->engine, std::ref(stop_flag), begin);
     }
     else if(command=="stop" || command=="quit"){
       // Stop searching

@@ -36,8 +36,8 @@ void Engine::initialize_parameters(){
   this->ponder=false;
   this->wtime=-1.0;
   this->btime=-1.0;
-  this->winc=-1.0;
-  this->binc=-1.0;
+  this->winc=0.0;
+  this->binc=0.0;
   this->movestogo=0;
   this->depth=0;
   this->nodes=0;
@@ -48,10 +48,11 @@ void Engine::initialize_parameters(){
 
 // Compute the best move
 //void Engine::compute(std::future<void> futureObj){
-void Engine::compute(std::atomic<bool> &stop_flag){
+void Engine::compute(std::atomic<bool> &stop_flag, std::clock_t begin){
   // Create the fundamentals classes
   Mover mover=Mover();
   Evaluation eval=Evaluation();
+  Timing timing=Timing(begin, this->board.get_turn()?this->wtime:this->btime, this->board.get_turn()?this->winc:this->binc, this->board.get_fullmoves(), this->movestogo);
 
   // See the possible moves
   std::vector<std::string> legal_moves = mover.possible_moves(this->board, this->board.get_turn(), this->debugging, true);
@@ -64,7 +65,7 @@ void Engine::compute(std::atomic<bool> &stop_flag){
   // Get original board so that we do not loss it
   Board board_original=this->board;
 
-  // Start first with small depths and increase it. This repeats unnecessary loops though they are the faster ones!!!!!!
+  // Start first with small depths and increase it. This repeats loops though they are the faster ones!!!!!!
   int curr_depth=1;
   while(curr_depth<=depth_max){ // It can be stopped from outside
     // Initialize the nodes
@@ -83,13 +84,13 @@ void Engine::compute(std::atomic<bool> &stop_flag){
     if(this->use_alphabeta){
       int alpha=2*NEG_INF;
       int beta=2*POS_INF;
-      best_score=this->alphabeta(this->searched_tree, curr_depth, alpha, beta, this->board.get_turn(), eval, mover, stop_flag);
+      best_score=this->alphabeta(this->searched_tree, curr_depth, alpha, beta, this->board.get_turn(), eval, mover, stop_flag, timing);
     }
     else
-      best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval, mover, stop_flag);
+      best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval, mover, stop_flag, timing);
     
     // Stop the routine without assigning the last value since we have interrupt it
-    if(stop_flag)
+    if(stop_flag || timing.time_to_move())
       break;
     
     // Get best move and best line
@@ -116,9 +117,9 @@ void Engine::compute(std::atomic<bool> &stop_flag){
 }
 
 // Alphabeta function
-int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag){
+int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag, Timing timing){
   // Stop searching when the flag is true
-  if(stop_flag)
+  if(stop_flag || timing.time_to_move())
     return 10*POS_INF;
 
   // If end of depth
@@ -148,7 +149,7 @@ int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizin
       child.score=eval.eval_pos(this->board);
 
       // Compute the alphabeta value
-      int val_alphabeta=this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover, stop_flag);
+      int val_alphabeta=this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover, stop_flag, timing);
       if(val_alphabeta>2*POS_INF)
         return val_alphabeta;
 
@@ -184,7 +185,7 @@ int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizin
       child.score=eval.eval_pos(this->board);
 
       // Compute alphabeta value
-      int val_alphabeta=this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover, stop_flag);
+      int val_alphabeta=this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover, stop_flag, timing);
       if(val_alphabeta>2*POS_INF)
         return val_alphabeta;
 
@@ -282,9 +283,9 @@ void Engine::display_nps(int nps){
 }
 
 // Minimax function
-int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag){
+int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag, Timing timing){
   // Stop searching when the flag is true
-  if(stop_flag)
+  if(stop_flag || timing.time_to_move())
     return 10*POS_INF;
 
   // If end of depth
@@ -314,7 +315,7 @@ int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eva
       child.score=eval.eval_pos(this->board);
 
       // Compute the minimax value
-      int val_minimax=this->minimax(child, depth-1, !maximizingPlayer, eval, mover, stop_flag);
+      int val_minimax=this->minimax(child, depth-1, !maximizingPlayer, eval, mover, stop_flag, timing);
       if(val_minimax>2*POS_INF)
         return val_minimax;
 
@@ -345,7 +346,7 @@ int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eva
       child.score=eval.eval_pos(this->board);
 
       // Compute the mimnimax value
-      int val_minimax=this->minimax(child, depth-1, !maximizingPlayer, eval, mover, stop_flag);
+      int val_minimax=this->minimax(child, depth-1, !maximizingPlayer, eval, mover, stop_flag, timing);
       if(val_minimax>2*POS_INF)
         return val_minimax;
 

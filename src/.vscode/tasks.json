@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "-g", "main.cpp", "uci.cpp", "board.cpp", "utilities.cpp", "engine.cpp", "mover.cpp", "evaluation.cpp", "-std=c++11", "-pthread", "-o", "../dist/DeepPigeon.exe"
+                "-g", "main.cpp", "uci.cpp", "board.cpp", "utilities.cpp", "timing.cpp", "engine.cpp", "mover.cpp", "evaluation.cpp", "-std=c++11", "-pthread", "-o", "../dist/DeepPigeon.exe"
             ],
             "group": {
                 "kind": "build",
