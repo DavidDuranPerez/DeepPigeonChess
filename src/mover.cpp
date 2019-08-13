@@ -200,9 +200,9 @@ std::vector<std::string> Mover::possible_moves(Board &board, bool white2move, bo
   }
 
   if(show_moves){
-    std::cout << "There are " << moves_definitive.size() << " possible moves:" << "\n";
+    sync_cout << "There are " << moves_definitive.size() << " possible moves:" << sync_endl;
     for(std::size_t i=0; i<moves_definitive.size(); ++i) 
-      std::cout << moves_definitive[i] << '\n'; 
+      sync_cout << moves_definitive[i] << sync_endl; 
   }
 
   // Get back the board position

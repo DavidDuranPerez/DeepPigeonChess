@@ -10,6 +10,7 @@
 
 // Own libraries
 #include "board.h"
+#include "utilities.h"
 
 // Class in charge of providing all possible moves
 class Mover{

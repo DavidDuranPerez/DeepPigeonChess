@@ -65,12 +65,12 @@ public:
     void initialize_parameters();
 
     // Get best move
-    void get_bestmove(){std::cout << "bestmove " << this->bestmove << "\n";};
+    void get_bestmove(){sync_cout << "bestmove " << this->bestmove << sync_endl;};
 
 private:
     // Minimax function
-    int minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover);
-    int alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover);
+    int minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag);
+    int alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag);
 
     // Display info
     void display_depth(int depth); // Display only the depth

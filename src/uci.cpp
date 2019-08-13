@@ -14,13 +14,13 @@ UCI::UCI(){
 
   // Set the initial time
   // this->initial_time = time(0);
-  // std::cout << this->initial_time << "\n";
+  // sync_cout << this->initial_time << sync_endl;
 }
 
 // Get the information of the engine
 void UCI::engine_info(){
-  std::cout << this->engine.engine_name << "\n";
-  std::cout << this->engine.engine_copyright << ", " << this->engine.engine_author << "\n\n";
+  sync_cout << this->engine.engine_name << sync_endl;
+  sync_cout << this->engine.engine_copyright << ", " << this->engine.engine_author << sync_endl;
 }
 
 // Get position
@@ -131,8 +131,8 @@ void UCI::comm_loop(){
   // Engine to GUI: id name, id author, uciok
   std::string command;
   std::string line_command;
-  std::thread calc_thread; // Thread
-  // Create a std::promise object to stop the thread
+  std::thread calc_thread; // Thread to calculate the lines
+  // Create a boolean that will be passed by reference to the thread in order to stop it
 	//std::promise<void> exitSignal;
   std::atomic<bool> stop_flag;
 
@@ -148,14 +148,20 @@ void UCI::comm_loop(){
     // Different commands
     if(command=="uci"){ // It tellsengine to use the uci communication
       // id
-      std::cout << "id name " << this->engine.engine_name << " " << this->engine.engine_version << "\n";
-      std::cout << "id author " << this->engine.engine_author << "\n";
+      sync_cout << "id name " << this->engine.engine_name << " " << this->engine.engine_version << sync_endl;
+      sync_cout << "id author " << this->engine.engine_author << sync_endl;
       // For the moment, no option is available
       // uciok
-      std::cout << "uciok" << "\n";
+      sync_cout << "uciok" << sync_endl;
     }
     else if(command=="ucinewgame"){
       // It should clear any search
+      // Stop searching
+      stop_flag=true;
+
+      // Wait for the thread to join
+      if(calc_thread.joinable())
+        calc_thread.join();
     }
     else if(command=="position"){
       // Get the position with all the arguments
@@ -173,9 +179,6 @@ void UCI::comm_loop(){
       //this->engine.compute();
       //calc_thread=std::thread(&Engine::compute, this->engine, std::move(futureObj));
       calc_thread=std::thread(&Engine::compute, this->engine, std::ref(stop_flag));
-
-      // Thread end
-      calc_thread.join();
     }
     else if(command=="stop" || command=="quit"){
       // Stop searching
@@ -191,9 +194,12 @@ void UCI::comm_loop(){
       this->engine.get_bestmove();
     }
     else if(command=="isready"){
-      // Finish anything that is doing
       // Answer back
-      std::cout << "readyok" << "\n";
+      sync_cout << "readyok" << sync_endl;
     }
   } while (command != "quit");
+
+  // Check that the thread has finished
+  if(calc_thread.joinable())
+    calc_thread.join();
 }

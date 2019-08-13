@@ -49,14 +49,25 @@ This chess engine uses the Universal Chess Interface protocol for communication.
 
   * quit
   * uci
-  * position fen [fen_str] moves [moves_str]
-  * position startpos moves [moves_str]
+  * isready
+  * ucinewgame
+  * position 
+
+    - position fen [fen_str] moves [moves_str]
+    - position startpos moves [moves_str]
+  * go
+
+    - go infinite
+    - go depth [depth_int]
+  * stop
 
 - Engine to GUI
 
   * id name
   * id author
   * uciok
+  * readyok
+  * bestmove [move_str]
 
 Testing
 ----------

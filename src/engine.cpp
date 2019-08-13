@@ -66,7 +66,7 @@ void Engine::compute(std::atomic<bool> &stop_flag){
 
   // Start first with small depths and increase it. This repeats unnecessary loops though they are the faster ones!!!!!!
   int curr_depth=1;
-  while(curr_depth<=depth_max && !stop_flag){ // It can be stopped from outside
+  while(curr_depth<=depth_max){ // It can be stopped from outside
     // Initialize the nodes
     sync_cout << stop_flag << sync_endl;
     Node node=Node();
@@ -84,10 +84,14 @@ void Engine::compute(std::atomic<bool> &stop_flag){
     if(this->use_alphabeta){
       int alpha=2*NEG_INF;
       int beta=2*POS_INF;
-      best_score=this->alphabeta(this->searched_tree, curr_depth, alpha, beta, this->board.get_turn(), eval, mover);
+      best_score=this->alphabeta(this->searched_tree, curr_depth, alpha, beta, this->board.get_turn(), eval, mover, stop_flag);
     }
     else
-      best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval, mover);
+      best_score=this->minimax(this->searched_tree, curr_depth, this->board.get_turn(), eval, mover, stop_flag);
+    
+    // Stop the routine without assigning the last value since we have interrupt it
+    if(stop_flag)
+      break;
     
     // Get best move and best line
     this->bestmove = this->searched_tree.bestmove; // The outer most
@@ -113,7 +117,11 @@ void Engine::compute(std::atomic<bool> &stop_flag){
 }
 
 // Alphabeta function
-int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover){
+int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag){
+  // Stop searching when the flag is true
+  if(stop_flag)
+    return 10*POS_INF;
+
   // If end of depth
   if(depth==0)
     return node.score;
@@ -140,8 +148,13 @@ int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizin
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
+      // Compute the alphabeta value
+      int val_alphabeta=this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover, stop_flag);
+      if(val_alphabeta>2*POS_INF)
+        return val_alphabeta;
+
       // Compute the maximum
-      int value_int=std::max(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
+      int value_int=std::max(value, val_alphabeta);
       if(value_int>value){
         node.bestmove=legal_moves[i];
         node.score=value_int;
@@ -171,8 +184,13 @@ int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizin
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
-      // Compute the maximum
-      int value_int=std::min(value, this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover));
+      // Compute alphabeta value
+      int val_alphabeta=this->alphabeta(child, depth-1, alpha, beta, !maximizingPlayer, eval, mover, stop_flag);
+      if(val_alphabeta>2*POS_INF)
+        return val_alphabeta;
+
+      // Compute the mininmum
+      int value_int=std::min(value, val_alphabeta);
       if(value_int<value){
         node.bestmove=legal_moves[i];
         node.score=value_int;
@@ -236,7 +254,7 @@ std::string Engine::get_pv(int depth){
 void Engine::display_depth(int depth){
   std::stringstream ss;
   ss << depth;
-  std::cout << "info depth " << ss.str() << "\n";
+  sync_cout << "info depth " << ss.str() << sync_endl;
 }
 void Engine::display_score(int depth, int score, int nodes, int nps, int time, std::string best_line){
   // Convert to strings
@@ -257,11 +275,15 @@ void Engine::display_score(int depth, int score, int nodes, int nps, int time, s
 void Engine::display_nps(int nps){
   std::stringstream ss;
   ss << nps;
-  std::cout << "info nps " << ss.str() << "\n"; 
+  sync_cout << "info nps " << ss.str() << sync_endl; 
 }
 
 // Minimax function
-int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover){
+int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eval, Mover mover, std::atomic<bool> &stop_flag){
+  // Stop searching when the flag is true
+  if(stop_flag)
+    return 10*POS_INF;
+
   // If end of depth
   if(depth==0)
     return node.score;
@@ -288,8 +310,13 @@ int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eva
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
+      // Compute the minimax value
+      int val_minimax=this->minimax(child, depth-1, !maximizingPlayer, eval, mover, stop_flag);
+      if(val_minimax>2*POS_INF)
+        return val_minimax;
+
       // Compute the maximum
-      int value_int=std::max(value, this->minimax(child, depth-1, !maximizingPlayer, eval, mover));
+      int value_int=std::max(value, val_minimax);
       if(value_int>value){
         node.move=legal_moves[i];
         node.score=value_int;
@@ -314,8 +341,13 @@ int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eva
       child.move=legal_moves[i];
       child.score=eval.eval_pos(this->board);
 
-      // Compute the maximum
-      int value_int=std::min(value, this->minimax(child, depth-1, !maximizingPlayer, eval, mover));
+      // Compute the mimnimax value
+      int val_minimax=this->minimax(child, depth-1, !maximizingPlayer, eval, mover, stop_flag);
+      if(val_minimax>2*POS_INF)
+        return val_minimax;
+
+      // Compute the minimum
+      int value_int=std::min(value, val_minimax);
       if(value_int<value){
         node.move=legal_moves[i];
         node.score=value_int;
