@@ -68,7 +68,6 @@ void Engine::compute(std::atomic<bool> &stop_flag){
   int curr_depth=1;
   while(curr_depth<=depth_max){ // It can be stopped from outside
     // Initialize the nodes
-    sync_cout << stop_flag << sync_endl;
     Node node=Node();
     this->searched_tree=node;
 
@@ -227,21 +226,25 @@ std::string Engine::get_pv(int depth){
   int curr_depth=depth;
 
   // Iterate the depths
-  while(depth>0){
-    // Search the move
+  while(curr_depth>0){
+    // Search the move within the current depth
     for(size_t i=0; i<node_selected.children.size(); i++)
     {
+      // Select the child and see it coincides
       Node node_int=node_selected.children[i];
       if(move2search==node_int.move){
         node_selected=node_int; // Select the child now
-        if(depth>1){
+        if(curr_depth>1){
           move2search=node_selected.bestmove; // New move to search
           if(move2search=="") // Due to a checkmate
-            depth=1; // Force ending of the line
-          else
+            curr_depth=1; // Force ending of the line
+          else{
             pv+=" "+move2search;
+            if(curr_depth==depth) // Assign the ponder too
+              this->bestponder=move2search;
+          }
         }
-        depth--; // Decrease the depth
+        curr_depth--; // Decrease the depth
         break;
       }
     }

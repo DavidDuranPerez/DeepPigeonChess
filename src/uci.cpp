@@ -21,6 +21,7 @@ UCI::UCI(){
 void UCI::engine_info(){
   sync_cout << this->engine.engine_name << sync_endl;
   sync_cout << this->engine.engine_copyright << ", " << this->engine.engine_author << sync_endl;
+  sync_cout << sync_endl;
 }
 
 // Get position

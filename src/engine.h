@@ -64,8 +64,8 @@ public:
     // Initialize parameters
     void initialize_parameters();
 
-    // Get best move
-    void get_bestmove(){sync_cout << "bestmove " << this->bestmove << sync_endl;};
+    // Get best move + ponder
+    void get_bestmove(){sync_cout << "bestmove " << this->bestmove << " ponder " << this->bestponder << sync_endl;};
 
 private:
     // Minimax function
@@ -100,6 +100,7 @@ private:
     // Results
     Node searched_tree; // List of nodes with their score
     std::string bestmove; // Best immediate move
+    std::string bestponder; // Best ponder move
     std::string bestline; // Best line
     int nodes_searched=0;
 };

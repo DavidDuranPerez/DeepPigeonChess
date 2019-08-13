@@ -63,11 +63,12 @@ This chess engine uses the Universal Chess Interface protocol for communication.
 
 - Engine to GUI
 
-  * id name
-  * id author
+  * id
+    - id name
+    - id author
   * uciok
   * readyok
-  * bestmove [move_str]
+  * bestmove [move_str] ponder [move_str]
 
 Testing
 ----------
