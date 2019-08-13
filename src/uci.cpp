@@ -172,6 +172,10 @@ void UCI::comm_loop(){
       // Pass several parameters to search
       this->get_go(var_stream);
 
+      // Finish a thread if it was opened from before
+      if(calc_thread.joinable())
+        calc_thread.join();
+
       // Start computing
       // Since this is a long process, we put it in a thread, which we can stop
       //Fetch std::future object associated with promise
