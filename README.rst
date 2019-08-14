@@ -70,6 +70,7 @@ This chess engine uses the Universal Chess Interface protocol for communication.
     - id author
   * uciok
   * readyok
+  * info depth [depth_int] score cp [score_int] nodes [nodes_int] nps [nps_int] time [time_int] pv [pv_str]
   * bestmove [move_str] ponder [move_str]
 
 Testing

@@ -28,11 +28,11 @@ bool Timing::time_to_move(){
         // Moves to go
         int moves_to_go=this->moves2go;
         int expected_moves=60; // We expect to go to 60
-        double expected_inc=expected_moves*this->inc; // Expected increment in time
         if(moves_to_go==0) // No other time control
             moves_to_go=expected_moves-this->move;
         if(moves_to_go<0)
             moves_to_go=10; // 10 extra moves
+        double expected_inc=moves_to_go*this->inc; // Expected increment in time
         
         // Target time
         double target = (this->time_left+expected_inc)/moves_to_go;
