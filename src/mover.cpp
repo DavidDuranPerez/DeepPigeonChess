@@ -10,20 +10,30 @@ Mover::Mover(){
 };
 
 bool Mover::is_checked(bool white2move){
-    // Get the position of the king
-    std::string target_square=this->find_king(white2move);
+  // For profiling purposes
+  std::clock_t begin;
+  if(PROFILING)
+    begin = clock();
 
-    // Return if in check
-    return this->is_in_check(this->board, !white2move, false, target_square);
+  // Get the position of the king
+  std::string target_square=this->find_king(white2move);
+
+  // Return if in check
+  bool checked=this->is_in_check(this->board, !white2move, false, target_square);
+
+  // For profiling purposes
+  if(PROFILING){
+    std::clock_t end = clock();
+    double elapsed_ms = double(end - begin);
+    ANALYZED_FUNCTION_TIME+=elapsed_ms;
+    ANALYZED_FUNCTION_COUNTER++;
+  }
+  
+  return checked;
 }
 
 // Moves from black that prevent a castle (aiming at key squares)
 bool Mover::aim_castle(bool white2move, std::vector<std::string> key_squares){
-  // For profiling purposes
-	std::clock_t begin;
-	if(PROFILING)
-		begin = clock();
-
   // Get all the possible moves from the opponent (black if white turn, white if black turn)
   std::vector<std::string> legal_moves = this->possible_moves(this->board, !white2move, false, false);
 
@@ -33,13 +43,6 @@ bool Mover::aim_castle(bool white2move, std::vector<std::string> key_squares){
     if(moves_square.size()>0)
       return true;
   }
-
-	if(PROFILING){
-		std::clock_t end = clock();
-    double elapsed_ms = double(end - begin);
-		ANALYZED_FUNCTION_TIME+=elapsed_ms;
-    ANALYZED_FUNCTION_COUNTER++;
-	}
 
   return false;
 }

@@ -2,7 +2,7 @@ Basics:
 * I/O protocol (UCI) --> http://wbec-ridderkerk.nl/html/UCIProtocol.html
 * Rules
 * Position Evaluation (heuristic rules) --> https://www.chess.com/blog/zaifrun/creating-a-chess-engine-part-4---position-evaluation, https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
-* Find next move (min-max, alpha-beta) --> https://www.chess.com/blog/zaifrun/creating-a-chess-engine-part-2, https://en.wikipedia.org/wiki/Minimax, https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning, https://www.chessprogramming.org/Alpha-Beta
+* Find next move (min-max, alpha-beta) --> https://www.chess.com/blog/zaifrun/creating-a-chess-engine-part-2, https://en.wikipedia.org/wiki/Minimax, https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning, https://www.chessprogramming.org/Alpha-Beta, https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/
 * Time Management --> https://www.chessprogramming.org/Time_Management
 
 Intermediate:

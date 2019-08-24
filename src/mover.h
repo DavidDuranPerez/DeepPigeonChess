@@ -14,10 +14,10 @@
 #include "utilities.h"
 
 // Variable for profiling
-bool const PROFILING=true;
+bool const PROFILING=false;
 extern double ANALYZED_FUNCTION_TIME;
 extern int ANALYZED_FUNCTION_COUNTER;
-std::string const ANALYZED_FUNCTION_NAME="aim_castle";
+std::string const ANALYZED_FUNCTION_NAME="is_checked";
 
 // Class in charge of providing all possible moves
 class Mover{

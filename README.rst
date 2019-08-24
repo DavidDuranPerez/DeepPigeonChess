@@ -78,6 +78,20 @@ Testing
 
 TBD
 
+Performance
+------------
+
+The performance of the position "position startpos moves d2d4 d7d5 c2c4 d5c4 e2e3 b7b5 a2a4 c7c6 a4b5 c6b5" at different dates has been:
+
++------------+-----------------------+
+| Date       |     NPS (Depth 4)     |
++============+=======================+
+| 07.08.2019 | 2k                    |
++------------+-----------------------+
+| 14.08.2019 | 6k                    |
++------------+-----------------------+
+
+
 Issue Tracker and Mailing List
 --------------------------------
 
