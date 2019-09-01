@@ -55,7 +55,7 @@ void Engine::compute(std::atomic<bool> &stop_flag, std::clock_t begin){
   Timing timing=Timing(begin, this->board.get_turn()?this->wtime:this->btime, this->board.get_turn()?this->winc:this->binc, this->board.get_fullmoves(), this->movestogo);
 
   // See the possible moves
-  std::vector<std::string> legal_moves = mover.possible_moves(this->board, this->board.get_turn(), this->debugging, true);
+  //std::vector<std::string> legal_moves = mover.possible_moves(this->board, this->board.get_turn(), this->debugging);
 
   // Decide the depth
   int depth_max=this->depth;
@@ -130,7 +130,7 @@ int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizin
   Board board_original=this->board;
 
   // Get all possible moves
-  std::vector<std::string> legal_moves = mover.possible_moves(this->board, maximizingPlayer, this->debugging, true);
+  std::vector<std::string> legal_moves = mover.possible_moves(this->board, maximizingPlayer, this->debugging);
 
   // See if it is checkmate (terminal node)
   if(this->board.is_checkmated()) // If checkmate, we still haven't evaluate it
@@ -296,7 +296,7 @@ int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eva
   Board board_original=this->board;
 
   // Get all possible moves
-  std::vector<std::string> legal_moves = mover.possible_moves(this->board, maximizingPlayer, this->debugging, true);
+  std::vector<std::string> legal_moves = mover.possible_moves(this->board, maximizingPlayer, this->debugging);
 
   // See if it is checkmate (terminal node)
   if(this->board.is_checkmated()) // If checkmate, we still haven't evaluate it

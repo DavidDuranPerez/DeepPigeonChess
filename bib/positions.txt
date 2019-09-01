@@ -2,3 +2,8 @@ Testing positions:
 
 position startpos moves d2d4 d7d5 c2c4 d5c4 e2e3 b7b5 a2a4 c7c6 a4b5 c6b5 d1f3 c8b7 --> QGA trick
 position startpos moves e2e3 f7f5 f1c4 g7g5 --> checkmate in 1
+position fen 4k3/8/8/5R2/8/8/8/4K3 b - - 0 1 --> Only three moves for black
+position fen 4k3/6N1/5b2/4R3/8/8/8/4K3 b - - 0 1 --> Double check (only king moves are possible)
+position fen 4k3/8/6n1/4R3/8/8/8/4K3 b - - 0 1 --> Single check
+position fen 8/8/8/2k5/3Pp3/8/8/4K3 b - d3 0 1 --> En-passant can evade check
+position fen 8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 0 1 --> En-passant can block check

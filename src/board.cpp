@@ -5,6 +5,7 @@
 
 #include "board.h"
 #include <vector>
+#include <stdlib.h>
 
 // Mapping for the columns
 std::map<int, char> col_map = {
@@ -27,12 +28,14 @@ std::map<int, char> col_map_reverse = {
     {'h', 9}};
 
 // Constructor for the square
-Square::Square(int row, char column, char piece, bool is_valid)
+Square::Square(int row, char column, char piece, bool is_valid, bool attacked_by_white, bool attacked_by_black)
 {
     this->row = row;
     this->column = column;
     this->piece = piece;
     this->is_valid = is_valid;
+    this->attacked_by_white = attacked_by_white;
+    this->attacked_by_black = attacked_by_black;
 };
 
 // Get the piece
@@ -332,6 +335,117 @@ void Board::fen2pos(std::string fen_str)
         this->print_board();
 }
 
+// Reset attacked squares
+void Board::reset_attacked_squares(){
+    // Initialize the checkers
+    this->checkers_white={};
+    this->checkers_black={};
+
+    // Loop all squares setting false to each attacked square, and true to capture mask + push mask
+    for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
+    { // row
+        for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
+        { // column
+            // Attacked squares
+            this->squares[i][j].set_white_attack(false);
+            this->squares[i][j].set_black_attack(false);
+
+            // Capture mask
+            this->squares[i][j].set_white_capture(true);
+            this->squares[i][j].set_black_capture(true);
+
+            // Block mask
+            this->squares[i][j].set_white_push(true);
+            this->squares[i][j].set_black_push(true);
+        }
+    }
+}
+
+// Set capture mask
+void Board::set_capture_mask(bool is_white, int i, int j){
+    // Loop all squares setting false the capture mask
+    for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
+    { // row
+        for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
+        { // column
+            // Capture mask
+            if(is_white)
+                this->squares[i][j].set_white_capture(false);
+            else
+                this->squares[i][j].set_black_capture(false);
+        }
+    }
+
+    // Set true only the interesting square
+    if(is_white)
+        this->squares[i][j].set_white_capture(true);
+    else
+        this->squares[i][j].set_black_capture(true);
+}
+
+// Empty push mask
+void Board::empty_push_mask(bool is_white){
+    for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
+    { // row
+        for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
+        { // column
+            // Capture mask
+            if(is_white)
+                this->squares[i][j].set_white_push(false);
+            else
+                this->squares[i][j].set_black_push(false);
+        }
+    } 
+}
+
+// Set push mask
+void Board::set_push_mask(bool is_white, int i_check, int j_check){
+    // Empty the push mask
+    this->empty_push_mask(is_white);
+
+    // Find the king
+    char piece2find;
+    int i_king, j_king;
+    if(is_white)
+        piece2find='K';
+    else
+        piece2find = 'k';
+
+    for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
+    { // row
+        for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
+        { // column
+            // King found
+            if(this->get_piece(i,j)==piece2find){
+                i_king=i;
+                j_king=j;
+                break;
+            }
+        }
+    }
+
+    // Make the mask
+    // Compute the gradients
+    int diff_x=i_king-i_check; // Difference in x
+    int diff_y=j_king-j_check; // Difference in y
+    int grad_x=(diff_x==0) ? 0 : diff_x/abs(diff_x); // Gradient in x
+    int grad_y=(diff_y==0) ? 0 : diff_y/abs(diff_y); // Gradient in y
+    // Make the loop for the mask
+    int i_curr=i_check+grad_x;
+    int j_curr=j_check+grad_y;
+    while(i_curr-i_king!=0 || j_curr-j_king!=0){
+        // Push to the mask
+        if(is_white)
+            this->squares[i_curr][j_curr].set_white_push(true);
+        else
+            this->squares[i_curr][j_curr].set_black_push(true);
+
+        // Increase
+        i_curr+=grad_x;
+        j_curr+=grad_y;
+    }
+}
+
 // Print the board (for debugging purposes)
 void Board::print_board()
 {
@@ -352,6 +466,52 @@ void Board::print_board()
         if (i == 2){
             std::cout << "+---+---+---+---+---+---+---+---+" << "\n";
             std::cout << "White to move?: " << std::boolalpha << this->white_moves << "; Allowed castles: " << this->allowed_castles << "; En-passant targets: " << this->en_passant_target << "; Halfmoves: " << this->halfmoves << "; Fullmoves:" << this->fullmoves;
+        }
+    }
+}
+
+// Print the board (for debugging purposes)
+void Board::print_attacked_by_white()
+{
+    for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
+    { // row
+        // Get the pieces
+        std::string pieces;
+        if (i < 10 && i > 1)
+            std::cout << "+---+---+---+---+---+---+---+---+"
+                      << "\n|";
+
+        for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
+        { // column
+            if (i < 10 && i > 1 && j < 10 && j > 1)
+                std::cout << " " << this->squares[i][j].is_attacked_by_white() << " |";
+        }
+        std::cout << "\n";
+        if (i == 2){
+            std::cout << "+---+---+---+---+---+---+---+---+" << "\n";
+        }
+    }
+}
+
+// Print the board (for debugging purposes)
+void Board::print_attacked_by_black()
+{
+    for (int i = sizeof(*this->squares) / sizeof(**this->squares) - 1; i >= 0; i--)
+    { // row
+        // Get the pieces
+        std::string pieces;
+        if (i < 10 && i > 1)
+            std::cout << "+---+---+---+---+---+---+---+---+"
+                      << "\n|";
+
+        for (int j = 0; j < sizeof(this->squares) / sizeof(*this->squares); j++)
+        { // column
+            if (i < 10 && i > 1 && j < 10 && j > 1)
+                std::cout << " " << this->squares[i][j].is_attacked_by_black() << " |";
+        }
+        std::cout << "\n";
+        if (i == 2){
+            std::cout << "+---+---+---+---+---+---+---+---+" << "\n";
         }
     }
 }
