@@ -10,7 +10,7 @@ Mover::Mover(){
 };
 
 // Find the square of the king
-std::string Mover::find_king(bool white2move){
+std::tuple<int, int> Mover::find_king(bool white2move){
   // Piece to find
   char piece2find;
   if(white2move)
@@ -27,11 +27,11 @@ std::string Mover::find_king(bool white2move){
       for (int j = 2; j < board_size-2; j++)
       { // column
         if(this->board.get_piece(i,j)==piece2find)
-          return this->notate_square(i, j);
+          return std::make_tuple(i, j);
       }
   }
 
-  return "error";
+  return std::make_tuple(-1, -1);
 }
 
 // Is the character in the array
@@ -322,7 +322,7 @@ std::vector<std::string> Mover::possible_moves(Board &board, bool white2move, bo
     this->board.set_checkmate(true);
   }
 
-  if(show_moves){
+  if(true || show_moves){
     sync_cout << "There are " << moves.size() << " possible moves:" << sync_endl;
     for(std::size_t i=0; i<moves.size(); ++i) 
       sync_cout << moves[i] << sync_endl; 
@@ -345,6 +345,69 @@ std::string Mover::notate_square(int i, int j){
   return orig_sq;
 };
 
+// Check en-passant discovered check
+bool Mover::is_enpassant_discovered_check(bool is_white, int j_left_pawn, int j_right_pawn, int i_pawns){
+  // Find the king that has to make the move
+  std::tuple<int, int> king_square=this->find_king(is_white);
+
+  // See if the king is on the same row as the pawns
+  if(std::get<0>(king_square)==i_pawns){
+    // Get the rank of the king
+    int j_king = std::get<1>(king_square);
+
+    // Direction to look into
+    int grad_x=(j_left_pawn-j_king)/abs(j_left_pawn-j_king);
+
+    // Loop in that direction
+    int j_curr=j_king+grad_x;
+    bool stop_search=false;
+    bool king_side=true; // We start at the king side
+    while(!stop_search){
+      // Avoid looking into the squares of the two pawns
+      if(j_curr!=j_left_pawn && j_curr!=j_right_pawn){
+        // Stop search if any piece on the same side of the king
+        if(king_side){
+          if(this->board.get_piece(i_pawns, j_curr)!=' ')
+            stop_search=true;
+        }
+        else{ // Other side of the king
+          if(is_white){
+            // Queen or rook
+            if(this->board.get_piece(i_pawns, j_curr)!='q' || this->board.get_piece(i_pawns, j_curr)!='r')
+              return true;
+            else{
+              // Piece blocking
+              if(this->board.get_piece(i_pawns, j_curr)!=' ')
+                stop_search=true;
+            }
+          }
+          else{
+            // Queen or rook
+            if(this->board.get_piece(i_pawns, j_curr)!='Q' || this->board.get_piece(i_pawns, j_curr)!='R')
+              return true;
+            else{
+              // Piece blocking
+              if(this->board.get_piece(i_pawns, j_curr)!=' ')
+                stop_search=true;
+            }
+          }
+        }
+      }
+      else{
+        if(j_curr==j_left_pawn)
+          king_side=false; // Not in the king side anymore
+      }
+
+      // Increase gradient
+      j_curr+=grad_x;
+    }
+  }
+
+  // By default return false
+  return false;
+}
+
+// Pawn moves
 std::vector<std::string> Mover::pawn_moves(int i, int j, bool is_white, bool record_attack/*=false*/){
   // Initialize the vector
   std::vector<std::string> moves_pawn={};
@@ -395,10 +458,9 @@ std::vector<std::string> Mover::pawn_moves(int i, int j, bool is_white, bool rec
           this->board.set_checker_white(i,j);
         }
       }
-        
     }
     // One square diagonal (en passant)
-    if(this->board.get_piece(i+1, j+1)==' ' && this->board.is_enpassant(i+1, j+1) && this->board.is_valid(i+1, j+1) && (this->board.get_capture(is_white, i, j+1) || this->board.get_push(is_white, i+1, j+1))){
+    if(this->board.get_piece(i+1, j+1)==' ' && this->board.is_enpassant(i+1, j+1) && this->board.is_valid(i+1, j+1) && (this->board.get_capture(is_white, i, j+1) || this->board.get_push(is_white, i+1, j+1)) && !this->is_enpassant_discovered_check(is_white, j, j+1, i)){
       std::string target_sq=this->notate_square(i+1,j+1);
       std::string move=orig_sq+target_sq;
       if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
@@ -430,7 +492,7 @@ std::vector<std::string> Mover::pawn_moves(int i, int j, bool is_white, bool rec
       }
     }
     // One square diagonal (en passant)
-    if(this->board.get_piece(i+1, j-1)==' ' && this->board.is_enpassant(i+1, j-1) && this->board.is_valid(i+1, j-1) && (this->board.get_capture(is_white, i, j-1) || this->board.get_push(is_white, i+1, j-1))){
+    if(this->board.get_piece(i+1, j-1)==' ' && this->board.is_enpassant(i+1, j-1) && this->board.is_valid(i+1, j-1) && (this->board.get_capture(is_white, i, j-1) || this->board.get_push(is_white, i+1, j-1)) && !this->is_enpassant_discovered_check(is_white, j-1, j, i)){
       std::string target_sq=this->notate_square(i+1,j-1);
       std::string move=orig_sq+target_sq;
       if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
@@ -489,7 +551,7 @@ std::vector<std::string> Mover::pawn_moves(int i, int j, bool is_white, bool rec
       }
     }
     // One square diagonal (en passant)
-    if(this->board.get_piece(i-1, j+1)==' ' && this->board.is_enpassant(i-1, j+1) && this->board.is_valid(i-1, j+1) && (this->board.get_capture(is_white, i, j+1) || this->board.get_push(is_white, i-1, j+1))){
+    if(this->board.get_piece(i-1, j+1)==' ' && this->board.is_enpassant(i-1, j+1) && this->board.is_valid(i-1, j+1) && (this->board.get_capture(is_white, i, j+1) || this->board.get_push(is_white, i-1, j+1)) && !this->is_enpassant_discovered_check(is_white, j, j+1, i)){
       std::string target_sq=this->notate_square(i-1,j+1);
       std::string move=orig_sq+target_sq;
       if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
@@ -521,7 +583,7 @@ std::vector<std::string> Mover::pawn_moves(int i, int j, bool is_white, bool rec
       }
     }
     // One square diagonal (en passant)
-    if(this->board.get_piece(i-1, j-1)==' ' && this->board.is_enpassant(i-1, j-1) && this->board.is_valid(i-1, j-1) && (this->board.get_capture(is_white, i, j-1) || this->board.get_push(is_white, i-1, j-1))){
+    if(this->board.get_piece(i-1, j-1)==' ' && this->board.is_enpassant(i-1, j-1) && this->board.is_valid(i-1, j-1) && (this->board.get_capture(is_white, i, j-1) || this->board.get_push(is_white, i-1, j-1)) && !this->is_enpassant_discovered_check(is_white, j-1, j, i)){
       std::string target_sq=this->notate_square(i-1,j-1);
       std::string move=orig_sq+target_sq;
       if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))

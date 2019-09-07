@@ -35,9 +35,10 @@ private:
     bool is_in_array2(char ch, char (&arr)[12]); // Is the character in the array
     bool is_in_vector(std::string str_val, std::vector<std::string> str_vec); // Is a string in a vector
     std::string notate_square(int i, int j); // Notate a square
-    std::string find_king(bool white2move); // Find the square of the king
+    std::tuple<int, int> find_king(bool white2move); // Find the square of the king
 
     // Movement Functions
+    bool is_enpassant_discovered_check(bool is_white, int j_left_pawn, int j_right_pawn, int i_pawns); // Check en-passant discovered check
     std::vector<std::string> pawn_moves(int i, int j, bool is_white, bool record_attack=false); // Pawn moves from the position i,j
     std::string basic_move_capture(int i_target, int j_target, bool is_white, bool is_king=false); // It tells which kind of move it is (normal, capture, block, invalid...)
     void RBQ_pinned(int i, int j, bool is_white, int (&grad_x)[8], int (&grad_y)[8], int N_grad); // To identify the pinned pieces by rooks, bishops or queens
