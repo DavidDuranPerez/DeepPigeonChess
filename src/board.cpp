@@ -357,6 +357,10 @@ void Board::reset_attacked_squares(){
             // Block mask
             this->squares[i][j].set_white_push(true);
             this->squares[i][j].set_black_push(true);
+
+            // Pinned pieces
+            this->squares[i][j].set_pinned(false);
+            this->squares[i][j].set_x_ray({});
         }
     }
 }

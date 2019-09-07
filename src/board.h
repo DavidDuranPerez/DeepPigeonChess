@@ -31,6 +31,8 @@ public:
     bool get_black_capture(){return this->capture_mask_black;};
     bool get_white_push(){return this->push_mask_white;};
     bool get_black_push(){return this->push_mask_black;};
+    bool is_pinned_piece(){return this->is_pinned;};
+    std::vector<std::string> get_x_ray(){return this->x_ray_pinned;};
     // Set piece
     void set_piece(char piece);
     // Set attacked squares
@@ -42,6 +44,9 @@ public:
     // Set block squares
     void set_white_push(bool val_bool){this->push_mask_white=val_bool;};
     void set_black_push(bool val_bool){this->push_mask_black=val_bool;};
+    // Set a pinned piece
+    void set_pinned(bool val_bool){this->is_pinned=val_bool;};
+    void set_x_ray(std::vector<std::string> x_ray){this->x_ray_pinned=x_ray;};
 
 private:
     // Attributes
@@ -55,6 +60,8 @@ private:
     bool capture_mask_black; // If not in check, true by default. Otherwise, only true where we can capture by black
     bool push_mask_white; // If not in check, true by default. Otherwise, only true where we can block by white
     bool push_mask_black; // If not in check, true by default. Otherwise, only true where we can block by black
+    bool is_pinned; // It tells if a piece is pinned or not
+    std::vector<std::string> x_ray_pinned; // The possible moves for the pinned pieces
 };
 
 // Class for the board
@@ -78,6 +85,9 @@ public:
     // Set block squares
     void set_white_push(int i, int j){this->squares[i][j].set_white_push(true);};
     void set_black_push(int i, int j){this->squares[i][j].set_black_push(true);};
+    // Set pinned piece
+    void set_pinned_piece(int i, int j){this->squares[i][j].set_pinned(true);};
+    void set_x_ray_pinned(int i, int j, std::vector<std::string> x_ray_pinned){this->squares[i][j].set_x_ray(x_ray_pinned);};
     // Getters
     int get_size(){return sizeof(this->squares) / sizeof(*this->squares);}; // Size
     bool get_turn(){return this->white_moves;}; // White to move?
@@ -93,6 +103,8 @@ public:
     bool is_square_attacked_by_black(int i, int j){return this->squares[i][j].is_attacked_by_black();};
     bool get_capture(bool is_white, int i, int j){return (is_white) ? this->squares[i][j].get_white_capture() : this->squares[i][j].get_black_capture();};
     bool get_push(bool is_white, int i, int j){return (is_white) ? this->squares[i][j].get_white_push() : this->squares[i][j].get_black_push();};
+    bool is_pinned_piece(int i, int j){return this->squares[i][j].is_pinned_piece();};
+    std::vector<std::string> get_x_ray_pinned(int i, int j){return this->squares[i][j].get_x_ray();};
 
     // Setter
     void set_checkmate(bool checkmated){this->checkmated=checkmated;}; // Set a checkmate

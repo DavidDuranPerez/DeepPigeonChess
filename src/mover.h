@@ -33,12 +33,15 @@ private:
     // Auxiliary Functions
     bool is_in_array(char ch, char (&arr)[6]); // Is the character in the array
     bool is_in_array2(char ch, char (&arr)[12]); // Is the character in the array
+    bool is_in_vector(std::string str_val, std::vector<std::string> str_vec); // Is a string in a vector
     std::string notate_square(int i, int j); // Notate a square
     std::string find_king(bool white2move); // Find the square of the king
 
     // Movement Functions
     std::vector<std::string> pawn_moves(int i, int j, bool is_white, bool record_attack=false); // Pawn moves from the position i,j
     std::string basic_move_capture(int i_target, int j_target, bool is_white, bool is_king=false); // It tells which kind of move it is (normal, capture, block, invalid...)
+    void RBQ_pinned(int i, int j, bool is_white, int (&grad_x)[8], int (&grad_y)[8], int N_grad); // To identify the pinned pieces by rooks, bishops or queens
+    std::vector<std::string> RBQ_moves(int i, int j, bool is_white, int (&grad_x)[8], int (&grad_y)[8], int N_grad, bool record_attack/*=false*/); // Common part of moves for rooks, bishops and queens
     std::vector<std::string> rook_moves(int i, int j, bool is_white, bool record_attack=false); // Rook moves from the position i,j
     std::vector<std::string> knight_moves(int i, int j, bool is_white, bool record_attack=false); // Knight moves from the position i,j
     std::vector<std::string> bishop_moves(int i, int j, bool is_white, bool record_attack=false); // Bishop moves from the position i,j
