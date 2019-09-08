@@ -19,3 +19,4 @@ position fen r3k2r/p1pp1pb1/bn2Qnp1/2qPN3/1p2P3/2N5/PPPBBPPP/R3K2R b QqKk - 3 2 
 position fen 2kr3r/p1ppqpb1/bn2Qnp1/3PN3/1p2P3/2N5/PPPBBPPP/R3K2R b QK - 3 2 --> d=1, n=44
 position fen rnb2k1r/pp1Pbppp/2p5/q7/2B5/8/PPPQNnPP/RNB1K2R w QK - 3 9 --> d=1, n=39
 position fen 2r5/3pk3/8/2P5/8/2K5/8/8 w - - 5 4 --> d=1, n=9
+position fen rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8 --> d=3, n=62379

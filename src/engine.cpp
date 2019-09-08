@@ -17,7 +17,7 @@ Node::Node(){
 // Default constructor for engine
 Engine::Engine(){
   this->debugging=false;
-  this->use_alphabeta=true;
+  this->use_alphabeta=false;
 };
 
 // Set a board
@@ -67,6 +67,7 @@ void Engine::compute(std::atomic<bool> &stop_flag, std::clock_t begin){
 
   // Start first with small depths and increase it. This repeats loops though they are the faster ones!!!!!!
   int curr_depth=1;
+  int previous_nodes=0; // Variable in order to subtract the nodes of the lower depth
   while(curr_depth<=depth_max){ // It can be stopped from outside
     // Initialize the nodes
     Node node=Node();
@@ -104,8 +105,12 @@ void Engine::compute(std::atomic<bool> &stop_flag, std::clock_t begin){
     // Display info
     if(elapsed_ms<1)
       elapsed_ms=1;
-    this->display_score(curr_depth, best_score, this->nodes_searched, (int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms), elapsed_ms, this->bestline);
+    // Note that though only the nodes of the current level are shown, for the speed we take into account the previous levels since they are computed again each time
+    this->display_score(curr_depth, best_score, this->nodes_searched-previous_nodes, (int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms), elapsed_ms, this->bestline);
     //this->display_nps((int)(this->nodes_searched*CLOCKS_PER_SEC/elapsed_ms));
+
+    // Save the previous nodes
+    previous_nodes=this->nodes_searched;
 
     // Increase the depth
     curr_depth++;
@@ -189,7 +194,7 @@ int Engine::alphabeta(Node &node, int depth, int alpha, int beta, bool maximizin
       if(val_alphabeta>2*POS_INF)
         return val_alphabeta;
 
-      // Compute the mininmum
+      // Compute the minimum
       int value_int=std::min(value, val_alphabeta);
       if(value_int<value){
         node.bestmove=legal_moves[i];
@@ -322,11 +327,11 @@ int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eva
       // Compute the maximum
       int value_int=std::max(value, val_minimax);
       if(value_int>value){
-        node.move=legal_moves[i];
+        node.bestmove=legal_moves[i];
         node.score=value_int;
       }
-      value=value_int;
       node.children.push_back(child); // Append the child to the parent
+      value=value_int;
     
       // Get back to the original board
       this->nodes_searched++;
@@ -353,7 +358,7 @@ int Engine::minimax(Node &node, int depth, bool maximizingPlayer, Evaluation eva
       // Compute the minimum
       int value_int=std::min(value, val_minimax);
       if(value_int<value){
-        node.move=legal_moves[i];
+        node.bestmove=legal_moves[i];
         node.score=value_int;
       }
       node.children.push_back(child); // Append the child to the parent

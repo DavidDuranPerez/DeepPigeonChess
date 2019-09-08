@@ -322,7 +322,7 @@ std::vector<std::string> Mover::possible_moves(Board &board, bool white2move, bo
     this->board.set_checkmate(true);
   }
 
-  if(true || show_moves){
+  if(show_moves){
     sync_cout << "There are " << moves.size() << " possible moves:" << sync_endl;
     for(std::size_t i=0; i<moves.size(); ++i) 
       sync_cout << moves[i] << sync_endl; 
