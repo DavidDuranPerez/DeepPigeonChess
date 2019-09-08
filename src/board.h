@@ -77,6 +77,7 @@ public:
     // Set attacked squares
     void set_white_attack(int i, int j){this->squares[i][j].set_white_attack(true);};
     void set_black_attack(int i, int j){this->squares[i][j].set_black_attack(true);};
+    void set_color_attack(bool is_white, int i, int j){(is_white) ? this->squares[i][j].set_white_attack(true) : this->squares[i][j].set_black_attack(true);};
     // Set capture mask
     void set_capture_mask(bool is_white, int i, int j);
     // Set push masks
@@ -112,6 +113,7 @@ public:
     // Setter for checkers
     void set_checker_white(int i, int j){this->checkers_white.push_back(std::make_tuple(i, j));};
     void set_checker_black(int i, int j){this->checkers_black.push_back(std::make_tuple(i, j));};
+    void set_checker_color(bool is_white, int i, int j){(is_white) ? this->checkers_white.push_back(std::make_tuple(i, j)) : this->checkers_black.push_back(std::make_tuple(i, j));};
 
     // Get number of checkers
     int get_num_checkers(bool is_white){return is_white ? this->checkers_black.size() : this->checkers_white.size();};

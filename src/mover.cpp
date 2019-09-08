@@ -415,187 +415,121 @@ std::vector<std::string> Mover::pawn_moves(int i, int j, bool is_white, bool rec
   // Original square
   std::string orig_sq=this->notate_square(i,j);
 
-  // Advance depends on the color
+  // Specific variables for white and black
+  int grad_y1, grad_y2;
+  int init_row, promotion_row; 
+  char opp_pieces[6];
   if(is_white){
-    // One square up
-    if(this->board.get_piece(i+1, j)==' ' && this->board.is_valid(i+1, j) && this->board.get_push(is_white, i+1, j)){
-      std::string target_sq=this->notate_square(i+1,j);
-      std::string move=orig_sq+target_sq;
-      // Make the promotion
-      if(i+1==9){
-        if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        {
-          moves_pawn.push_back(move+'q'); // Queen promotion
-          moves_pawn.push_back(move+'r'); // Rook promotion
-          moves_pawn.push_back(move+'n'); // Knight promotion
-          moves_pawn.push_back(move+'b'); // Bishop promotion
-        }
-      }
-      else{
-        if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-          moves_pawn.push_back(move);
-      }
-    }
-    // Two squares up
-    if(i==3 && this->board.get_piece(i+1, j)==' ' && this->board.get_piece(i+2, j)==' ' && this->board.is_valid(i+2, j) && this->board.get_push(is_white, i+2, j)){
-      std::string target_sq=this->notate_square(i+2,j);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-    }
-    // One square diagonal (capture) --> king capture should never happen unless checkmate
-    if(((this->board.get_piece(i+1, j+1)=='p' || this->board.get_piece(i+1, j+1)=='r' || this->board.get_piece(i+1, j+1)=='n' || this->board.get_piece(i+1, j+1)=='b' || this->board.get_piece(i+1, j+1)=='q' || this->board.get_piece(i+1, j+1)=='k') || record_attack) && this->board.is_valid(i+1, j+1) && this->board.get_capture(is_white, i+1, j+1)){
-      std::string target_sq=this->notate_square(i+1,j+1);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i+1,j+1);
+    // Gradients
+    grad_y1=1;
+    grad_y2=2;
 
-        // Checker
-        if(this->board.get_piece(i+1, j+1)=='k'){
-          this->board.set_checker_white(i,j);
-        }
+    // Special rows
+    init_row=3;
+    promotion_row=9;
+
+    // Opposite pieces
+    opp_pieces[0]='p'; opp_pieces[1]='r'; opp_pieces[2]='n'; opp_pieces[3]='b'; opp_pieces[4]='q'; opp_pieces[5]='k';
+  }
+  else{
+    // Gradients
+    grad_y1=-1;
+    grad_y2=-2;
+
+    // Special rows
+    init_row=8;
+    promotion_row=2;
+
+    // Opposite pieces
+    opp_pieces[0]='P'; opp_pieces[1]='R'; opp_pieces[2]='N'; opp_pieces[3]='B'; opp_pieces[4]='Q'; opp_pieces[5]='K';
+  }
+
+  // One square up
+  if(this->board.get_piece(i+grad_y1, j)==' ' && this->board.is_valid(i+grad_y1, j) && this->board.get_push(is_white, i+grad_y1, j)){
+    std::string target_sq=this->notate_square(i+grad_y1,j);
+    std::string move=orig_sq+target_sq;
+    // Make the promotion
+    if(i+grad_y1==promotion_row){
+      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j)))){
+        moves_pawn.push_back(move+'q'); // Queen promotion
+        moves_pawn.push_back(move+'r'); // Rook promotion
+        moves_pawn.push_back(move+'n'); // Knight promotion
+        moves_pawn.push_back(move+'b'); // Bishop promotion
       }
     }
-    // One square diagonal (en passant)
-    if(this->board.get_piece(i+1, j+1)==' ' && this->board.is_enpassant(i+1, j+1) && this->board.is_valid(i+1, j+1) && (this->board.get_capture(is_white, i, j+1) || this->board.get_push(is_white, i+1, j+1)) && !this->is_enpassant_discovered_check(is_white, j, j+1, i)){
-      std::string target_sq=this->notate_square(i+1,j+1);
-      std::string move=orig_sq+target_sq;
+    else{
       if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
         moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i+1,j+1);
-
-        // Checker
-        if(this->board.get_piece(i+1, j+1)=='k'){
-          this->board.set_checker_white(i,j);
-        }
-      }
     }
-    // One square diagonal (capture) --> king capture should never happen unless checkmate
-    if(((this->board.get_piece(i+1, j-1)=='p' || this->board.get_piece(i+1, j-1)=='r' || this->board.get_piece(i+1, j-1)=='n' || this->board.get_piece(i+1, j-1)=='b' || this->board.get_piece(i+1, j-1)=='q' || this->board.get_piece(i+1, j-1)=='k') || record_attack) && this->board.is_valid(i+1, j-1) && this->board.get_capture(is_white, i+1, j-1)){
-      std::string target_sq=this->notate_square(i+1,j-1);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i+1,j-1);
+  }
+  // Two squares up
+  if(i==init_row && this->board.get_piece(i+grad_y1, j)==' ' && this->board.get_piece(i+grad_y2, j)==' ' && this->board.is_valid(i+grad_y2, j) && this->board.get_push(is_white, i+grad_y2, j)){
+    std::string target_sq=this->notate_square(i+grad_y2,j);
+    std::string move=orig_sq+target_sq;
+    if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
+      moves_pawn.push_back(move);
+  }
+  // One square diagonal (capture) --> king capture should never happen unless checkmate
+  if(((this->board.get_piece(i+grad_y1, j+1)==opp_pieces[0] || this->board.get_piece(i+grad_y1, j+1)==opp_pieces[1] || this->board.get_piece(i+grad_y1, j+1)==opp_pieces[2] || this->board.get_piece(i+grad_y1, j+1)==opp_pieces[3] || this->board.get_piece(i+grad_y1, j+1)==opp_pieces[4] || this->board.get_piece(i+grad_y1, j+1)==opp_pieces[5]) || record_attack) && this->board.is_valid(i+grad_y1, j+1) && this->board.get_capture(is_white, i+grad_y1, j+1)){
+    std::string target_sq=this->notate_square(i+grad_y1,j+1);
+    std::string move=orig_sq+target_sq;
+    if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
+      moves_pawn.push_back(move);
+    // Record an attacked squared
+    if(record_attack){
+      this->board.set_color_attack(is_white, i+grad_y1,j+1);
 
-        // Checker
-        if(this->board.get_piece(i+1, j-1)=='k'){
-          this->board.set_checker_white(i,j);
-        }
-      }
-    }
-    // One square diagonal (en passant)
-    if(this->board.get_piece(i+1, j-1)==' ' && this->board.is_enpassant(i+1, j-1) && this->board.is_valid(i+1, j-1) && (this->board.get_capture(is_white, i, j-1) || this->board.get_push(is_white, i+1, j-1)) && !this->is_enpassant_discovered_check(is_white, j-1, j, i)){
-      std::string target_sq=this->notate_square(i+1,j-1);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i+1,j-1);
-
-        // Checker
-        if(this->board.get_piece(i+1, j-1)=='k'){
-          this->board.set_checker_white(i,j);
-        }
+      // Checker
+      if(this->board.get_piece(i+grad_y1, j+1)==opp_pieces[5]){
+        this->board.set_checker_color(is_white, i,j);
       }
     }
   }
-  else{
-    // One square up
-    if(this->board.get_piece(i-1, j)==' ' && this->board.is_valid(i-1, j) && this->board.get_push(is_white, i-1, j)){
-      std::string target_sq=this->notate_square(i-1,j);
-      std::string move=orig_sq+target_sq;
-      // Make the promotion
-      if(i-1==2){
-        if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j)))){
-          moves_pawn.push_back(move+'q'); // Queen promotion
-          moves_pawn.push_back(move+'r'); // Rook promotion
-          moves_pawn.push_back(move+'n'); // Knight promotion
-          moves_pawn.push_back(move+'b'); // Bishop promotion
-        }
-      }
-      else{
-        if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-          moves_pawn.push_back(move);
-      }
-    }
-    // Two squares up
-    if(i==8 && this->board.get_piece(i-1, j)==' ' && this->board.get_piece(i-2, j)==' ' && this->board.is_valid(i-2, j) && this->board.get_push(is_white, i-2, j)){
-      std::string target_sq=this->notate_square(i-2,j);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-    }
-    // One square diagonal (capture) --> king capture should never happen unless checkmate
-    if(((this->board.get_piece(i-1, j+1)=='P' || this->board.get_piece(i-1, j+1)=='R' || this->board.get_piece(i-1, j+1)=='N' || this->board.get_piece(i-1, j+1)=='B' || this->board.get_piece(i-1, j+1)=='Q' || this->board.get_piece(i-1, j+1)=='K') || record_attack) && this->board.is_valid(i-1, j+1) && this->board.get_capture(is_white, i-1, j+1)){
-      std::string target_sq=this->notate_square(i-1,j+1);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i-1,j+1);
+  // One square diagonal (en passant)
+  if(this->board.get_piece(i+grad_y1, j+1)==' ' && this->board.is_enpassant(i+grad_y1, j+1) && this->board.is_valid(i+grad_y1, j+1) && (this->board.get_capture(is_white, i, j+1) || this->board.get_push(is_white, i+grad_y1, j+1)) && !this->is_enpassant_discovered_check(is_white, j, j+1, i)){
+    std::string target_sq=this->notate_square(i+grad_y1,j+1);
+    std::string move=orig_sq+target_sq;
+    if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
+      moves_pawn.push_back(move);
+    // Record an attacked squared
+    if(record_attack){
+      this->board.set_color_attack(is_white, i+grad_y1,j+1);
 
-        // Checker
-        if(this->board.get_piece(i-1, j+1)=='K'){
-          this->board.set_checker_black(i,j);
-        }
+      // Checker
+      if(this->board.get_piece(i+1, j+1)==opp_pieces[5]){
+        this->board.set_checker_color(is_white, i,j);
       }
     }
-    // One square diagonal (en passant)
-    if(this->board.get_piece(i-1, j+1)==' ' && this->board.is_enpassant(i-1, j+1) && this->board.is_valid(i-1, j+1) && (this->board.get_capture(is_white, i, j+1) || this->board.get_push(is_white, i-1, j+1)) && !this->is_enpassant_discovered_check(is_white, j, j+1, i)){
-      std::string target_sq=this->notate_square(i-1,j+1);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i-1,j+1);
+  }
+  // One square diagonal (capture) --> king capture should never happen unless checkmate
+  if(((this->board.get_piece(i+grad_y1, j-1)==opp_pieces[0] || this->board.get_piece(i+grad_y1, j-1)==opp_pieces[1] || this->board.get_piece(i+grad_y1, j-1)==opp_pieces[2] || this->board.get_piece(i+grad_y1, j-1)==opp_pieces[3] || this->board.get_piece(i+grad_y1, j-1)==opp_pieces[4] || this->board.get_piece(i+grad_y1, j-1)==opp_pieces[5]) || record_attack) && this->board.is_valid(i+grad_y1, j-1) && this->board.get_capture(is_white, i+grad_y1, j-1)){
+    std::string target_sq=this->notate_square(i+grad_y1,j-1);
+    std::string move=orig_sq+target_sq;
+    if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
+      moves_pawn.push_back(move);
+    // Record an attacked squared
+    if(record_attack){
+      this->board.set_color_attack(is_white, i+grad_y1,j-1);
 
-        // Checker
-        if(this->board.get_piece(i-1, j+1)=='K'){
-          this->board.set_checker_black(i,j);
-        }
+      // Checker
+      if(this->board.get_piece(i+grad_y1, j-1)==opp_pieces[5]){
+        this->board.set_checker_color(is_white, i,j);
       }
     }
-    // One square diagonal (capture) --> king capture should never happen unless checkmate
-    if(((this->board.get_piece(i-1, j-1)=='P' || this->board.get_piece(i-1, j-1)=='R' || this->board.get_piece(i-1, j-1)=='N' || this->board.get_piece(i-1, j-1)=='B' || this->board.get_piece(i-1, j-1)=='Q' || this->board.get_piece(i-1, j-1)=='K') || record_attack) && this->board.is_valid(i-1, j-1) && this->board.get_capture(is_white, i-1, j-1)){
-      std::string target_sq=this->notate_square(i-1,j-1);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i-1,j-1);
+  }
+  // One square diagonal (en passant)
+  if(this->board.get_piece(i+grad_y1, j-1)==' ' && this->board.is_enpassant(i+grad_y1, j-1) && this->board.is_valid(i+grad_y1, j-1) && (this->board.get_capture(is_white, i, j-1) || this->board.get_push(is_white, i+grad_y1, j-1)) && !this->is_enpassant_discovered_check(is_white, j-1, j, i)){
+    std::string target_sq=this->notate_square(i+grad_y1,j-1);
+    std::string move=orig_sq+target_sq;
+    if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
+      moves_pawn.push_back(move);
+    // Record an attacked squared
+    if(record_attack){
+      this->board.set_color_attack(is_white, i+grad_y1,j-1);
 
-        // Checker
-        if(this->board.get_piece(i-1, j-1)=='K'){
-          this->board.set_checker_black(i,j);
-        }
-      }
-    }
-    // One square diagonal (en passant)
-    if(this->board.get_piece(i-1, j-1)==' ' && this->board.is_enpassant(i-1, j-1) && this->board.is_valid(i-1, j-1) && (this->board.get_capture(is_white, i, j-1) || this->board.get_push(is_white, i-1, j-1)) && !this->is_enpassant_discovered_check(is_white, j-1, j, i)){
-      std::string target_sq=this->notate_square(i-1,j-1);
-      std::string move=orig_sq+target_sq;
-      if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
-        moves_pawn.push_back(move);
-      // Record an attacked squared
-      if(record_attack){
-        this->board.set_white_attack(i-1,j-1);
-
-        // Checker
-        if(this->board.get_piece(i-1, j-1)=='K'){
-          this->board.set_checker_black(i,j);
-        }
+      // Checker
+      if(this->board.get_piece(i+grad_y1, j-1)=='k'){
+        this->board.set_checker_color(is_white, i,j);
       }
     }
   }
@@ -753,17 +687,14 @@ std::vector<std::string> Mover::RBQ_moves(int i, int j, bool is_white, int (&gra
 
         // Record an attacked squared
         if(record_attack){
+          this->board.set_color_attack(is_white, y, x);
           if(is_white){
-            this->board.set_white_attack(y, x);
-              
             // Checker
             if(this->board.get_piece(y, x)=='k'){
               this->board.set_checker_white(i,j);
             }
           }
           else{
-            this->board.set_black_attack(y, x);
-            
             // Checker
             if(this->board.get_piece(y, x)=='K'){
               this->board.set_checker_black(i,j);
@@ -779,12 +710,8 @@ std::vector<std::string> Mover::RBQ_moves(int i, int j, bool is_white, int (&gra
           moves.push_back(move);
 
         // Record an attacked squared
-        if(record_attack){
-          if(is_white)
-            this->board.set_white_attack(y, x);
-          else
-            this->board.set_black_attack(y, x);
-        }
+        if(record_attack)
+          this->board.set_color_attack(is_white, y, x);
       }
       
       // Increase the gradient
@@ -795,7 +722,6 @@ std::vector<std::string> Mover::RBQ_moves(int i, int j, bool is_white, int (&gra
 
   return moves;
 }
-
 
 std::vector<std::string> Mover::rook_moves(int i, int j, bool is_white, bool record_attack/*=false*/){
   // Gradients for the 4 directions
@@ -853,12 +779,8 @@ std::vector<std::string> Mover::king_moves(int i, int j, bool is_white, bool che
       if((is_white && !this->board.is_square_attacked_by_black(y, x)) || (!is_white && !this->board.is_square_attacked_by_white(y, x))) 
         moves_king.push_back(move);
       // Record an attacked squared
-      if(record_attack){
-        if(is_white)
-          this->board.set_white_attack(y, x);
-        else
-          this->board.set_black_attack(y, x);
-      }
+      if(record_attack)
+        this->board.set_color_attack(is_white, y, x);
     }
   }
 
@@ -923,17 +845,14 @@ std::vector<std::string> Mover::knight_moves(int i, int j, bool is_white, bool r
 
       // Record an attacked squared
       if(record_attack){
+        this->board.set_color_attack(is_white, y, x);
         if(is_white){
-          this->board.set_white_attack(y, x);
-            
           // Checker
           if(decision=="capture" && this->board.get_piece(y, x)=='k'){
             this->board.set_checker_white(i,j);
           }
         }
         else{
-          this->board.set_black_attack(y, x);
-          
           // Checker
           if(decision=="capture" && this->board.get_piece(y, x)=='K'){
             this->board.set_checker_black(i,j);
