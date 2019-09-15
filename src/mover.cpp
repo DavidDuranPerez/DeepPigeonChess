@@ -697,8 +697,11 @@ std::vector<std::string> Mover::RBQ_moves(int i, int j, bool is_white, int (&gra
       // Decision of what to do with the target square
       std::string decision=this->basic_move_capture(y, x, is_white);
       // Differente cases
-      if(decision=="block" || decision=="invalid")
+      if(decision=="block" || decision=="invalid"){
+        if(record_attack && decision=="block") // Record attack on the block so that the king cannot capture a protected piece
+          this->board.set_color_attack(is_white, y, x);
         break;
+      }
       else if(decision=="capture"){
         // Add the move
         if(!(this->board.is_pinned_piece(i, j) && !this->is_in_vector(target_sq, this->board.get_x_ray_pinned(i, j))))
@@ -797,10 +800,15 @@ std::vector<std::string> Mover::king_moves(int i, int j, bool is_white, bool che
       // Avoid entering in an attacked square
       if((is_white && !this->board.is_square_attacked_by_black(y, x)) || (!is_white && !this->board.is_square_attacked_by_white(y, x))) 
         moves_king.push_back(move);
+
       // Record an attacked squared
       if(record_attack)
         this->board.set_color_attack(is_white, y, x);
     }
+
+    // Record also an attack when protecting a piece
+    if(record_attack && decision=="block")
+      this->board.set_color_attack(is_white, y, x);
   }
 
   // Castling can be done if: allowed (king and rook not moved before), empty squares between king and rook, and no enemy piece aiming at key squares
@@ -879,6 +887,10 @@ std::vector<std::string> Mover::knight_moves(int i, int j, bool is_white, bool r
         }
       }
     }
+
+    // Record an attack when protecting a piece too
+    if(record_attack && decision=="block")
+      this->board.set_color_attack(is_white, y, x);
   }
 
   return moves_knight;

@@ -65,7 +65,8 @@ void Engine::compute(std::atomic<bool> &stop_flag, std::clock_t begin){
   // Get original board so that we do not loss it
   Board board_original=this->board;
 
-  // Start first with small depths and increase it. This repeats loops though they are the faster ones!!!!!!
+  // Iterative deepening: Start first with small depths and increase it. 
+  // This repeats loops though they are the faster ones. To implement transposition tables (hash tables) !!!!!!
   int curr_depth=1;
   int previous_nodes=0; // Variable in order to subtract the nodes of the lower depth
   while(curr_depth<=depth_max){ // It can be stopped from outside
