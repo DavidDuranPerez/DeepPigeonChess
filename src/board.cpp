@@ -167,16 +167,28 @@ void Board::move(std::string fromto, bool print_board)
             this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
             this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');  
         }
-        else if(piece_from=='R' && col_from==2 && row_from==2){ // White long rook
+        else if(piece_from=='R' && col_from==2 && row_from==2){ // White long rook moves
             this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
         }
-        else if(piece_from=='R' && col_from==9 && row_from==2){ // White short rook
+        else if(piece_to=='R' && col_to==2 && row_to==2){ // White long rook is captured or a piece goes to the place of this rook
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'Q');
+        }
+        else if(piece_from=='R' && col_from==9 && row_from==2){ // White short rook moves
             this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
         }
-        else if(piece_from=='r' && col_from==2 && row_from==9){ // Black long rook
+        else if(piece_to=='R' && col_to==9 && row_to==2){ // White short rook is captured or a piece goes to the place of this rook
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'K');
+        }
+        else if(piece_from=='r' && col_from==2 && row_from==9){ // Black long rook moves
             this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
         }
-        else if(piece_from=='r' && col_from==9 && row_from==9){ // Black short rook
+        else if(piece_to=='r' && col_to==2 && row_to==9){ // Black long rook is captured or a piece goes to the place of this rook
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'q');
+        }
+        else if(piece_from=='r' && col_from==9 && row_from==9){ // Black short rook moves
+            this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
+        }
+        else if(piece_to=='r' && col_to==9 && row_to==9){ // Black short rook is captured or a piece goes to the place of this rook
             this->allowed_castles=this->subtract_character(this->allowed_castles, 'k');
         }
     }

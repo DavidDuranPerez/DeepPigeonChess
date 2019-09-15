@@ -322,7 +322,7 @@ std::vector<std::string> Mover::possible_moves(Board &board, bool white2move, bo
     this->board.set_checkmate(true);
   }
 
-  if(show_moves){
+  if(true || show_moves){
     sync_cout << "There are " << moves.size() << " possible moves:" << sync_endl;
     for(std::size_t i=0; i<moves.size(); ++i) 
       sync_cout << moves[i] << sync_endl; 
@@ -816,20 +816,20 @@ std::vector<std::string> Mover::king_moves(int i, int j, bool is_white, bool che
     // White castles
     if(is_white){
       // Short castle
-      if(this->board.is_castle_allowed('K') && this->board.get_piece(2, 7)==' ' && this->board.get_piece(2, 8)==' ' && (!this->board.is_square_attacked_by_black(2, 6) && !this->board.is_square_attacked_by_black(2, 7) && !this->board.is_square_attacked_by_black(2, 8)))
+      if(this->board.is_castle_allowed('K') && this->board.get_piece(2, 7)==' ' && this->board.get_piece(2, 8)==' ' && this->board.get_piece(2, 9)=='R' && (!this->board.is_square_attacked_by_black(2, 6) && !this->board.is_square_attacked_by_black(2, 7) && !this->board.is_square_attacked_by_black(2, 8)))
         moves_king.push_back("e1g1");
 
       // Long castle
-      if(this->board.is_castle_allowed('Q') && this->board.get_piece(2, 3)==' ' && this->board.get_piece(2, 4)==' ' && this->board.get_piece(2, 5)==' ' && (!this->board.is_square_attacked_by_black(2, 6) && !this->board.is_square_attacked_by_black(2, 5) && !this->board.is_square_attacked_by_black(2, 4)))
+      if(this->board.is_castle_allowed('Q') && this->board.get_piece(2, 3)==' ' && this->board.get_piece(2, 4)==' ' && this->board.get_piece(2, 5)==' ' && this->board.get_piece(2, 2)=='R' && (!this->board.is_square_attacked_by_black(2, 6) && !this->board.is_square_attacked_by_black(2, 5) && !this->board.is_square_attacked_by_black(2, 4)))
         moves_king.push_back("e1c1");
     }
     else{ // Black castles
       // Short castle
-      if(this->board.is_castle_allowed('k') && this->board.get_piece(9, 7)==' ' && this->board.get_piece(9, 8)==' ' && (!this->board.is_square_attacked_by_white(9, 6) && !this->board.is_square_attacked_by_white(9, 7) && !this->board.is_square_attacked_by_white(9, 8)))
+      if(this->board.is_castle_allowed('k') && this->board.get_piece(9, 7)==' ' && this->board.get_piece(9, 8)==' ' && this->board.get_piece(9, 9)=='r' && (!this->board.is_square_attacked_by_white(9, 6) && !this->board.is_square_attacked_by_white(9, 7) && !this->board.is_square_attacked_by_white(9, 8)))
         moves_king.push_back("e8g8");
 
       // Long castle
-      if(this->board.is_castle_allowed('q') && this->board.get_piece(9, 3)==' ' && this->board.get_piece(9, 4)==' ' && this->board.get_piece(9, 5)==' ' && (!this->board.is_square_attacked_by_white(9, 6) && !this->board.is_square_attacked_by_white(9, 5) && !this->board.is_square_attacked_by_white(9, 4)))
+      if(this->board.is_castle_allowed('q') && this->board.get_piece(9, 3)==' ' && this->board.get_piece(9, 4)==' ' && this->board.get_piece(9, 5)==' ' && this->board.get_piece(9, 2)=='r' && (!this->board.is_square_attacked_by_white(9, 6) && !this->board.is_square_attacked_by_white(9, 5) && !this->board.is_square_attacked_by_white(9, 4)))
         moves_king.push_back("e8c8");
     }
   }
