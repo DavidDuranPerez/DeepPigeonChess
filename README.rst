@@ -90,6 +90,8 @@ The performance of the position "position startpos moves d2d4 d7d5 c2c4 d5c4 e2e
 +------------+-----------------------+
 | 14.08.2019 | 6k                    |
 +------------+-----------------------+
+| 15.09.2019 | 24k                    |
++------------+-----------------------+
 
 
 Issue Tracker and Mailing List

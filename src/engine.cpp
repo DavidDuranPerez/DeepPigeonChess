@@ -17,7 +17,7 @@ Node::Node(){
 // Default constructor for engine
 Engine::Engine(){
   this->debugging=false;
-  this->use_alphabeta=false;
+  this->use_alphabeta=true;
 };
 
 // Set a board
