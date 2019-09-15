@@ -322,7 +322,7 @@ std::vector<std::string> Mover::possible_moves(Board &board, bool white2move, bo
     this->board.set_checkmate(true);
   }
 
-  if(true || show_moves){
+  if(show_moves){
     sync_cout << "There are " << moves.size() << " possible moves:" << sync_endl;
     for(std::size_t i=0; i<moves.size(); ++i) 
       sync_cout << moves[i] << sync_endl; 
@@ -568,12 +568,18 @@ std::string Mover::basic_move_capture(int i_target, int j_target, bool is_white,
 
     // Capture --> king capture should never happen unless checkmate
     if(is_white){
-      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q' || this->board.get_piece(i_target, j_target)=='k') && this->board.is_valid(i_target, j_target) && (is_king || this->board.get_capture(is_white, i_target, j_target))){
-        return "capture";
+      if((this->board.get_piece(i_target, j_target)=='p' || this->board.get_piece(i_target, j_target)=='r' || this->board.get_piece(i_target, j_target)=='n' || this->board.get_piece(i_target, j_target)=='b' || this->board.get_piece(i_target, j_target)=='q' || this->board.get_piece(i_target, j_target)=='k') && this->board.is_valid(i_target, j_target)){
+        if(is_king || this->board.get_capture(is_white, i_target, j_target))
+          return "capture";
+        else
+          return "invalid capture";
       }
     }else{
-      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q' || this->board.get_piece(i_target, j_target)=='K') && this->board.is_valid(i_target, j_target) && (is_king || this->board.get_capture(is_white, i_target, j_target))){
-        return "capture";
+      if((this->board.get_piece(i_target, j_target)=='P' || this->board.get_piece(i_target, j_target)=='R' || this->board.get_piece(i_target, j_target)=='N' || this->board.get_piece(i_target, j_target)=='B' || this->board.get_piece(i_target, j_target)=='Q' || this->board.get_piece(i_target, j_target)=='K') && this->board.is_valid(i_target, j_target)){
+        if(is_king || this->board.get_capture(is_white, i_target, j_target))
+          return "capture";
+        else
+          return "invalid capture";
       }
     }
 
@@ -618,7 +624,7 @@ void Mover::RBQ_pinned(int i, int j, bool is_white, int (&grad_x)[8], int (&grad
       // Decision of what to do with the target square
       std::string decision=this->basic_move_capture(y, x, is_white);
       // Differente cases
-      if(decision=="block" || decision=="invalid")
+      if(decision=="block" || decision=="invalid" || decision=="invalid capture")
         break;
       else if(decision=="capture"){
         // Record an attacked squared
@@ -697,7 +703,7 @@ std::vector<std::string> Mover::RBQ_moves(int i, int j, bool is_white, int (&gra
       // Decision of what to do with the target square
       std::string decision=this->basic_move_capture(y, x, is_white);
       // Differente cases
-      if(decision=="block" || decision=="invalid"){
+      if(decision=="block" || decision=="invalid" || decision=="invalid capture"){
         if(record_attack && decision=="block") // Record attack on the block so that the king cannot capture a protected piece
           this->board.set_color_attack(is_white, y, x);
         break;
