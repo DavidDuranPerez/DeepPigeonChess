@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build_custom",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g", "src/main.cpp", "src/uci.cpp", "src/board.cpp", "src/utilities.cpp", "src/timing.cpp", "src/engine.cpp", "src/mover.cpp", "src/evaluation.cpp", "-std=c++11", "-pthread", "-o", "dist/DeepPigeon.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build_test",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g", "tests/board_test.cpp", "-std=c++11", "-pthread", "-o", "dist/DeepPigeon_test.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

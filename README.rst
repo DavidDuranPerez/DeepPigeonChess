@@ -9,7 +9,7 @@ This is Deep Pigeon, a chess engine written in C++
    :alt: DeepPigeon build status on Appveyor
    :target: https://ci.appveyor.com/project/DavidDuranPerez/deeppigeonchess/branch/master
 
-Copyright (C) 2019, David Duran
+Copyright (C) 2019-2020, David Duran
 
 .. contents::
 

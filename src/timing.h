@@ -1,6 +1,6 @@
 /*
   Deep Pigeon, a chess engine
-  Copyright (C) 2019, David Duran
+  Copyright (C) 2019-2020, David Duran
 */
 #ifndef TIMING_H_INCLUDED
 #define TIMING_H_INCLUDED

@@ -1,6 +1,6 @@
 /*
   Deep Pigeon, a chess engine
-  Copyright (C) 2019, David Duran
+  Copyright (C) 2019-2020, David Duran
 */
 #ifndef ENGINE_H_INCLUDED
 #define ENGINE_H_INCLUDED
@@ -44,7 +44,7 @@ public:
     // Public parameters
     std::string engine_name = "Deep Pigeon";
     std::string engine_author = "David Duran";
-    std::string engine_copyright = "Copyright (C) 2019";
+    std::string engine_copyright = "Copyright (C) 2019-2020";
     std::string engine_version = "0.1";
 
     // Setters

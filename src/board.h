@@ -1,6 +1,6 @@
 /*
   Deep Pigeon, a chess engine
-  Copyright (C) 2019, David Duran
+  Copyright (C) 2019-2020, David Duran
 */
 #ifndef BOARD_H_INCLUDED
 #define BOARD_H_INCLUDED
