@@ -86,7 +86,7 @@ To run the tests, the first thing you have to do is to download the GTest suite 
 
 Then, GTest has to be built using the following command (assuming that the previous repository has been renamed as "gtest"::
 
-  g++ -isystem gtest/include -Igtest -pthread -c gtest/src/gtest-all.cc
+  g++ -isystem gtest/include -Igtest -std=c++11 -pthread -c gtest/src/gtest-all.cc
 
 Now, just copy the library to the main root of the project::
 
@@ -94,7 +94,7 @@ Now, just copy the library to the main root of the project::
 
 Finally, the tests can be run using the following command::
 
-  g++ -isystem gtest/include src/board.cpp -pthread tests/board_test.cpp libgtest.a -o dist/DeepPigeon_test.exe
+  g++ -isystem gtest/include src/board.cpp -std=c++11 -pthread tests/board_test.cpp libgtest.a -o dist/DeepPigeon_test.exe
 
 
 Performance
