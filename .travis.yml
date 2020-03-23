@@ -21,7 +21,7 @@ script:
 - cd src
 - g++ -g main.cpp uci.cpp board.cpp utilities.cpp timing.cpp engine.cpp mover.cpp evaluation.cpp -std=c++11 -pthread -o DeepPigeon
 - cd ..
-- g++ -isystem gtest/include src/board.cpp -pthread tests/board_test.cpp libgtest.a -o dist/DeepPigeon_test
+- g++ -isystem gtest/include src/board.cpp -std=c++11 -pthread tests/board_test.cpp libgtest.a -o dist/DeepPigeon_test
 
 after_success:
   - coveralls --root . -E ".*dist.*" -E ".*bib.*" -E ".*gtest.*" -E ".*CMakeFiles.*"
