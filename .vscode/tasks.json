@@ -20,7 +20,7 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "-g", "tests/board_test.cpp", "-std=c++11", "-pthread", "-o", "dist/DeepPigeon_test.exe"
+                "-isystem", "gtest/include", "src/board.cpp", "-pthread", "tests/board_test.cpp", "libgtest.a", "-o", "dist/DeepPigeon_test.exe"
             ],
             "group": {
                 "kind": "build",

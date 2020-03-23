@@ -76,7 +76,22 @@ This chess engine uses the Universal Chess Interface protocol for communication.
 Testing
 ----------
 
-TBD
+To run the tests, the first thing you have to do is to download the GTest suite from Github::
+
+  https://github.com/google/googletest/tree/master/googletest
+
+Then, GTest has to be built using the following command (assuming that the previous repository has been renamed as "gtest"::
+
+  g++ -isystem gtest/include -Igtest -pthread -c gtest/src/gtest-all.cc ar -rv libgtest.a gtest-all.o
+
+Now, just copy the library to the main root of the project::
+
+  ar -rv libgtest.a gtest-all.o
+
+Finally, the tests can be run using the following command::
+
+  g++ -isystem gtest/include src/board.cpp -pthread tests/board_test.cpp libgtest.a -o dist/DeepPigeon_test.exe
+
 
 Performance
 ------------

@@ -82,5 +82,9 @@
             }
         ]
     },
-    "restructuredtext.confPath": ""
+    "restructuredtext.confPath": "",
+    "gtest-adapter.debugConfig": [
+        "(gdb) Test"
+    ],
+    "gtest-adapter.supportLocation": true
 }
