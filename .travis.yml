@@ -13,7 +13,7 @@ install:
   - sudo apt-get install -qq g++-5
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
   - git clone https://github.com/google/googletest.git gtest
-  - g++ -isystem gtest/googletest/include -Igtest -pthread -c gtest/googletest/src/gtest-all.cc ar -rv libgtest.a gtest-all.o
+  - g++ -isystem gtest/googletest/include -Igtest -pthread -c gtest/googletest/src/gtest-all.cc
   - ar -rv libgtest.a gtest-all.o
 
 script:
