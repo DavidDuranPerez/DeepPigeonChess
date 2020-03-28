@@ -14,8 +14,8 @@ before_install:
 
 install: 
   # C++11
-  - sudo apt-get install -qq g++-5
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
+  - sudo apt-get install -qq g++-6
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
   - git clone https://github.com/google/googletest.git gtest2
   - mv gtest2/googletest gtest
   - g++ -isystem gtest/include -Igtest -std=c++11 -pthread -c gtest/src/gtest-all.cc
