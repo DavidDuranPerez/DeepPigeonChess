@@ -40,6 +40,22 @@ namespace {
 
         // Get the piece
         EXPECT_EQ(sq.get_piece(), 'R') << "Erroneous piece set";
+        // Set another piece
+        sq.set_piece('B');
+        EXPECT_EQ(sq.get_piece(), 'B') << "Erroneous piece set";
+        // Get the column and row
+        EXPECT_EQ(sq.get_col(), 'a') << "Erroneous column";
+        EXPECT_EQ(sq.get_row(), 2) << "Erroneous row";
+    }
+
+    // Test to set a board
+    TEST(BoardTest, SetBoard){
+        // Create the board with the starting position
+        Board bd = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+        // Get the pieces of some squares
+        EXPECT_EQ(bd.get_piece(2, 3), 'N') << "Erroneous white piece";
+        EXPECT_EQ(bd.get_piece(9, 2), 'r') << "Erroneous black piece";
     }
 }  // namespace
 
