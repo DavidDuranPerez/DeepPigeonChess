@@ -28,7 +28,7 @@ script:
 - g++ -isystem gtest/include src/board.cpp -std=c++11 -pthread tests/board_test.cpp libgtest.a -o dist/DeepPigeon_test
 
 after_success:
-  - coveralls --skip-ssl-verify --root . -E ".*dist.*" -E ".*tests.*" -E ".*bib.*" -E ".*gtest.*" -E ".*CMakeFiles.*"
+  - coveralls --verbose --root . -E ".*dist.*" -E ".*tests.*" -E ".*bib.*" -E ".*gtest.*" -E ".*CMakeFiles.*"
 
 branches:
   only:
